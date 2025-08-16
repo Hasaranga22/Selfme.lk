@@ -23,7 +23,7 @@ import Gimage5 from "./Home-Images/G5.jpeg";
 import Gimage6 from "./Home-Images/G6.jpeg";
 import Gimage7 from "./Home-Images/G7.jpeg";
 import Gimage8 from "./Home-Images/G8.jpeg";
-import Gimage9 from "./Home-Images/G9.jpeg";
+import CTA_image from "./Home-Images/cta-image.jpg";
 
 function Home() {
   const [currentSlide, setCurrentSlide] = useState(0);
@@ -371,6 +371,114 @@ function Home() {
           <div className="gallery-item">
             <img src={Gimage8} alt="Solar installation project" />
             <div className="image-overlay"></div>
+          </div>
+        </div>
+      </div>
+
+      <div className="cta-section">
+        <div className="cta-container">
+          <div className="cta-content">
+            <h2>Ready to Power Your Future with Solar Energy?</h2>
+            <p>
+              Join hundreds of satisfied customers who are saving money and
+              reducing their carbon footprint with our premium solar solutions.
+            </p>
+            <div className="cta-buttons">
+              <button className="cta-primary">Get a Free Quote</button>
+              <button className="cta-secondary">Learn More</button>
+            </div>
+          </div>
+          <div className="cta-image">
+            <img src={CTA_image} alt="" />
+          </div>
+        </div>
+      </div>
+
+      <div className="ourTeam-section">
+        <h2>Our Team</h2>
+        <div className="team-container">
+          <div className="team-member">
+            <img
+              src="https://randomuser.me/api/portraits/women/32.jpg"
+              alt="Sameera Dharmasiri"
+            />
+            <h4>Sameera Dharmasiri</h4>
+            <p className="position">CEO & Founder</p>
+            <p className="bio">
+              15+ years in renewable energy. Founded Selfme.lk to bring
+              affordable solar solutions to Sri Lankan homes and businesses.
+            </p>
+            <div className="social-links">
+              <a href="#">
+                <i className="fab fa-linkedin"></i>
+              </a>
+              <a href="#">
+                <i className="fab fa-twitter"></i>
+              </a>
+            </div>
+          </div>
+
+          <div className="team-member">
+            <img
+              src="https://randomuser.me/api/portraits/men/45.jpg"
+              alt="Rajith Perera"
+            />
+            <h4>Rajith Perera</h4>
+            <p className="position">Solar Engineer</p>
+            <p className="bio">
+              Certified solar specialist with 8 years experience. Designs
+              efficient systems tailored to Sri Lanka's climate.
+            </p>
+            <div className="social-links">
+              <a href="#">
+                <i className="fab fa-linkedin"></i>
+              </a>
+              <a href="#">
+                <i className="fab fa-twitter"></i>
+              </a>
+            </div>
+          </div>
+
+          <div className="team-member">
+            <img
+              src="https://randomuser.me/api/portraits/women/68.jpg"
+              alt="Nayana Silva"
+            />
+            <h4>Nayana Silva</h4>
+            <p className="position">Installation Manager</p>
+            <p className="bio">
+              Leads our installation teams with 10 years of field experience.
+              Ensures flawless implementation of every project.
+            </p>
+            <div className="social-links">
+              <a href="#">
+                <i className="fab fa-linkedin"></i>
+              </a>
+              <a href="#">
+                <i className="fab fa-twitter"></i>
+              </a>
+            </div>
+          </div>
+
+          <div className="team-member">
+            <img
+              src="https://randomuser.me/api/portraits/men/22.jpg"
+              alt="Dinesh Fernando"
+            />
+            <h4>Dinesh Fernando</h4>
+            <p className="position">Customer Support</p>
+            <p className="bio">
+              5+ years in customer care. Provides ongoing support and
+              maintenance guidance for all solar system owners.
+            </p>
+            <div className="social-links">
+              <a href="#">
+                <i className="fab fa-linkedin"></i>
+              </a>
+              <a href="#">
+                <i className="fab fa-twitter"></i>
+              </a>
+            </div>
           </div>
         </div>
       </div>
