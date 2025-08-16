@@ -9,6 +9,21 @@ import CusSupport from "./Home-Images/cusSupport.png";
 import Quality from "./Home-Images/quality.png";
 import Warranty from "./Home-Images/warranty.png";
 import PowerSaving from "./Home-Images/powerSaving.png";
+import Aboutus_banner from "./Home-Images/Aboutus-banner.jpg";
+import kw5Solar from "./Home-Images/5kw solar.png";
+import Inverter from "./Home-Images/Inverter.jpg";
+import BusinessSolar from "./Home-Images/Business solar.png";
+import Battery from "./Home-Images/ProductBattery.jpg";
+
+import Gimage1 from "./Home-Images/G1.jpg";
+import Gimage2 from "./Home-Images/G2.jpg";
+import Gimage3 from "./Home-Images/G3.jpg";
+import Gimage4 from "./Home-Images/G4.jpeg";
+import Gimage5 from "./Home-Images/G5.jpeg";
+import Gimage6 from "./Home-Images/G6.jpeg";
+import Gimage7 from "./Home-Images/G7.jpeg";
+import Gimage8 from "./Home-Images/G8.jpeg";
+import Gimage9 from "./Home-Images/G9.jpeg";
 
 function Home() {
   const [currentSlide, setCurrentSlide] = useState(0);
@@ -143,6 +158,7 @@ function Home() {
         </div>
       </div>
 
+      <h2 class="after-heading-choose-us">Why Choose Us</h2>
       <div className="service-box-section">
         <div className="service-box">
           <img src={Warranty} alt="Warranty Icon" />
@@ -178,6 +194,184 @@ function Home() {
             Our dedicated support team is available round the clock to address
             any questions or concerns about your solar system.
           </p>
+        </div>
+      </div>
+
+      <div className="about-us">
+        <h2 className="section-title">About Selfme.lk</h2>
+        <div className="about-us-main">
+          <div className="about-us-image">
+            <img src={Aboutus_banner} alt="About Selfme.lk solar solutions" />
+          </div>
+          <div className="about-us-content">
+            <p className="about-text">
+              Selfme.lk is a leading solar energy solutions provider in Sri
+              Lanka, dedicated to delivering sustainable and cost-effective
+              renewable energy solutions. With years of experience in the
+              industry, we specialize in high-quality solar panel installations,
+              energy storage systems, and comprehensive maintenance services.
+              <br></br>
+              Our strategic collaborations with industry leaders like Kelani
+              Cables guarantee superior wiring solutions that meet international
+              safety standards, while our certified partnership with CEB (Ceylon
+              Electricity Board) ensures seamless grid integration for all our
+              installations.
+            </p>
+            <div className="button-group">
+              <button className="primary-btn">View Products</button>
+              <button className="secondary-btn">Contact us</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div className="Products">
+        <h2>Our Product Categories</h2>
+        <div className="Product-section">
+          <div className="products-category">
+            <img src={kw5Solar} alt="temp solar" />
+            <h3>5KW Home Solar System</h3>
+            <p>Perfect for houses, save 70% bill</p>
+            <button>View Details</button>
+          </div>
+
+          <div className="products-category">
+            <img src={BusinessSolar} alt="" />
+            <h3>20KW Business Package</h3>
+            <p>Best for small businesses</p>
+            <button>View Details</button>
+          </div>
+
+          <div className="products-category">
+            <img src={Battery} alt="" />
+            <h3>Lithium-ion Battery Pack</h3>
+            <p>Long lifespan, maintenance free</p>
+            <button>View Details</button>
+          </div>
+
+          <div className="products-category">
+            <img src={Inverter} alt="" />
+            <h3>Hybrid Inverter</h3>
+            <p>Smart switching between solar & grid</p>
+            <button>View Details</button>
+          </div>
+        </div>
+        <button class="allProducts-btn">View All Products</button>
+      </div>
+
+      <h2 class="after-heading-choose-us">Our testimonials</h2>
+      <div className="testimonial-section">
+        <div className="testimonial">
+          <img
+            src="https://randomuser.me/api/portraits/men/32.jpg"
+            alt="Customer"
+          />
+          <div className="rating">
+            <span className="star">★</span>
+            <span className="star">★</span>
+            <span className="star">★</span>
+            <span className="star">★</span>
+            <span className="star">★</span>
+          </div>
+          <h4>Jake Gyllenhaal</h4>
+          <p>
+            "The solar installation was seamless and the energy savings are
+            incredible!"
+          </p>
+        </div>
+
+        <div className="testimonial">
+          <img
+            src="https://randomuser.me/api/portraits/women/44.jpg"
+            alt="Customer"
+          />
+          <div className="rating">
+            <span className="star">★</span>
+            <span className="star">★</span>
+            <span className="star">★</span>
+            <span className="star">★</span>
+            <span className="star">★</span>
+          </div>
+          <h4>Sarah Johnson</h4>
+          <p>
+            "Excellent service and professional team. My electricity bill
+            dropped by 70%!"
+          </p>
+        </div>
+
+        <div className="testimonial">
+          <img
+            src="https://randomuser.me/api/portraits/men/75.jpg"
+            alt="Customer"
+          />
+          <div className="rating">
+            <span className="star">★</span>
+            <span className="star">★</span>
+            <span className="star">★</span>
+            <span className="star">★</span>
+            <span className="star">★</span>
+          </div>
+          <h4>Michael Chen</h4>
+          <p>
+            "The system works perfectly even during power outages. Highly
+            recommend!"
+          </p>
+        </div>
+
+        <div className="testimonial">
+          <img
+            src="https://randomuser.me/api/portraits/women/68.jpg"
+            alt="Customer"
+          />
+          <div className="rating">
+            <span className="star">★</span>
+            <span className="star">★</span>
+            <span className="star">★</span>
+            <span className="star">★</span>
+            <span className="star">★</span>
+          </div>
+          <h4>Emily Rodriguez</h4>
+          <p>
+            "The installation was quick and the team was very knowledgeable."
+          </p>
+        </div>
+      </div>
+
+      <div className="gallery-section">
+        <h1>Our Gallery</h1>
+        <div className="gallery-grid">
+          <div className="gallery-item">
+            <img src={Gimage1} alt="Solar installation project" />
+            <div className="image-overlay"></div>
+          </div>
+          <div className="gallery-item">
+            <img src={Gimage2} alt="Solar installation project" />
+            <div className="image-overlay"></div>
+          </div>
+          <div className="gallery-item">
+            <img src={Gimage3} alt="Solar installation project" />
+            <div className="image-overlay"></div>
+          </div>
+          <div className="gallery-item">
+            <img src={Gimage4} alt="Solar installation project" />
+            <div className="image-overlay"></div>
+          </div>
+          <div className="gallery-item">
+            <img src={Gimage5} alt="Solar installation project" />
+            <div className="image-overlay"></div>
+          </div>
+          <div className="gallery-item">
+            <img src={Gimage6} alt="Solar installation project" />
+            <div className="image-overlay"></div>
+          </div>
+          <div className="gallery-item">
+            <img src={Gimage7} alt="Solar installation project" />
+            <div className="image-overlay"></div>
+          </div>
+          <div className="gallery-item">
+            <img src={Gimage8} alt="Solar installation project" />
+            <div className="image-overlay"></div>
+          </div>
         </div>
       </div>
     </div>
