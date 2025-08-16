@@ -1,0 +1,421 @@
+/* Selfme.lk Solar Company - Professional Banner Slider */
+*{
+    font-family: 'poppins';
+}
+
+/* Main Carousel Container */
+#default-carousel {
+  position: relative;
+  width: 97%;
+  max-width: 100%;
+  margin: 2rem auto;
+  border-radius: 24px;
+  overflow: hidden;
+  /* box-shadow: 0 25px 80px rgba(0, 0, 0, 0.3), 0 0 0 1px rgba(16, 15, 15, 0.1); */
+  background: linear-gradient(135deg, #1a1a1a, #2d2d2d);
+}
+
+/* Carousel Wrapper */
+#default-carousel .relative.h-56 {
+  position: relative;
+  height: 400px;
+  overflow: hidden;
+  background: #1a1a1a;
+}
+
+@media (min-width: 768px) {
+  #default-carousel .relative.h-56 {
+    height: 650px;
+  }
+}
+
+/* Banner Slides */
+.banner-slide {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  opacity: 0;
+  transition: all 0.7s cubic-bezier(0.4, 0, 0.2, 1);
+  transform: scale(1.05);
+  z-index: 1;
+}
+
+.banner-slide.active {
+  opacity: 1;
+  transform: scale(1);
+  z-index: 2;
+}
+
+/* Banner Images */
+.banner-slide img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+  transition: transform 13s ease-out;
+}
+
+.banner-slide.active img {
+  animation: subtleZoom 12s ease-in-out infinite alternate;
+}
+
+@keyframes subtleZoom {
+  0% {
+    transform: scale(1);
+  }
+  100% {
+    transform: scale(1.08);
+  }
+}
+
+/* Banner Overlay */
+.banner-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(
+    135deg,
+    rgba(0, 0, 0, 0.8) 0%,
+    rgba(20, 20, 20, 0.7) 30%,
+    rgba(40, 40, 40, 0.5) 70%,
+    rgba(60, 60, 60, 0.3) 100%
+  );
+  z-index: 3;
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  padding: 2rem 4rem;
+}
+
+/* Banner Content Container */
+.banner-content {
+  max-width: 600px;
+  color: white;
+  animation: slideInContent 0.8s ease-out;
+  font-family: "poppins";
+}
+
+@keyframes slideInContent {
+  0% {
+    opacity: 0;
+    transform: translateY(50px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Banner Title */
+.banner-title {
+  font-family: "poppins";
+  font-size: 3rem;
+  font-weight: 800;
+  line-height: 1.4;
+  margin-bottom: 1rem;
+  background: linear-gradient(135deg, #ffffff, #e8f5e8);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  /* text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3); */
+  animation: fadeInUp 0.8s ease-out 0.6s both;
+}
+
+/* Banner Subtitle */
+.banner-subtitle {
+  font-family: "poppins";
+  font-size: 1.3rem;
+  font-weight: 600;
+  color: #a8e6cf;
+  margin-bottom: 1.5rem;
+  letter-spacing: 0.5px;
+  animation: fadeInUp 0.8s ease-out 0.8s both;
+}
+
+/* Banner Description */
+.banner-description {
+  font-size: 1.1rem;
+  line-height: 1.6;
+  color: rgba(255, 255, 255, 0.9);
+  margin-bottom: 2rem;
+  max-width: 500px;
+  animation: fadeInUp 0.8s ease-out 1s both;
+}
+
+/* Highlight Badge */
+.highlight-badge {
+  display: inline-block;
+  margin-bottom: 2rem;
+  animation: fadeInUp 0.8s ease-out 1.2s both;
+}
+
+.highlight-text {
+  background: linear-gradient(135deg, #ffd700, #ffeb3b);
+  color: #1b5e20;
+  padding: 0.6rem 1.2rem;
+  border-radius: 20px;
+  font-weight: 400;
+  font-size: 0.95rem;
+  display: inline-block;
+  animation: pulse 2s ease-in-out infinite;
+  font-family: "poppins";
+}
+
+@keyframes pulse {
+  0%,
+  100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.05);
+  }
+}
+
+/* Call to Action Buttons */
+.banner-actions {
+  display: flex;
+  gap: 1rem;
+  flex-wrap: wrap;
+  animation: fadeInUp 0.8s ease-out 1.4s both;
+}
+
+.cta-button {
+  font-family: "poppins";
+  font-weight: 600;
+  font-size: 1rem;
+  padding: 0.9rem 2rem;
+  border-radius: 25px;
+  border: none;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  letter-spacing: 0.5px;
+  position: relative;
+  overflow: hidden;
+  font-family: "poppins";
+}
+
+.cta-button.primary {
+  background: linear-gradient(135deg, #66bb6a, #81c784);
+  color: #1b5e20;
+  box-shadow: 0 6px 20px rgba(102, 187, 106, 0.4);
+  font-family: "poppins";
+}
+
+.cta-button.primary:hover {
+  background: linear-gradient(135deg, #4caf50, #66bb6a);
+  transform: translateY(-2px);
+  box-shadow: 0 10px 30px rgba(102, 187, 106, 0.6);
+}
+
+.cta-button.secondary {
+  background: rgba(255, 255, 255, 0.1);
+  color: white;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  backdrop-filter: blur(10px);
+}
+
+.cta-button.secondary:hover {
+  background: rgba(255, 255, 255, 0.2);
+  border-color: rgba(255, 255, 255, 0.5);
+  transform: translateY(-2px);
+}
+
+/* Fade In Animation */
+@keyframes fadeInUp {
+  0% {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Mobile Responsiveness */
+@media (max-width: 1024px) {
+  .banner-title {
+    font-size: 2.5rem;
+  }
+
+  .banner-overlay {
+    padding: 2rem 3rem;
+  }
+}
+
+@media (max-width: 768px) {
+  #default-carousel {
+    margin: 1rem auto;
+    border-radius: 16px;
+  }
+
+  #default-carousel .relative.h-56 {
+    height: 400px;
+  }
+
+  .banner-overlay {
+    padding: 1.5rem 2rem;
+    justify-content: center;
+    text-align: center;
+  }
+
+  .banner-content {
+    max-width: 100%;
+  }
+
+  .banner-title {
+    font-size: 2rem;
+  }
+
+  .banner-subtitle {
+    font-size: 1.1rem;
+  }
+
+  .banner-description {
+    font-size: 1rem;
+  }
+
+  .banner-actions {
+    justify-content: center;
+  }
+
+  .cta-button {
+    padding: 0.8rem 1.5rem;
+    font-size: 0.9rem;
+  }
+
+  .nav-arrow {
+    width: 45px;
+    height: 45px;
+  }
+}
+
+@media (max-width: 480px) {
+  #default-carousel .relative.h-56 {
+    height: 350px;
+  }
+
+  .banner-overlay {
+    padding: 1rem 1.5rem;
+  }
+
+  .banner-title {
+    font-size: 1.6rem;
+  }
+
+  .banner-subtitle {
+    font-size: 1rem;
+  }
+
+  .banner-description {
+    font-size: 0.9rem;
+    margin-bottom: 1.5rem;
+  }
+
+  .banner-actions {
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .cta-button {
+    width: 100%;
+    max-width: 250px;
+  }
+
+  .company-badge {
+    margin-bottom: 1rem;
+  }
+}
+
+/* Professional Enhancement */
+#default-carousel {
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+#default-carousel:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 35px 100px rgba(45, 80, 22, 0.25),
+    0 0 0 1px rgba(104, 160, 133, 0.4);
+}
+
+
+
+
+
+/* Service Boxes Section */
+.service-box-section {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 2rem;
+  padding: 3rem 1rem;
+  max-width: 1600px;
+  margin: 0 auto;
+}
+
+.service-box {
+  flex: 1;
+  min-width: 280px;
+  max-width: 350px;
+  background: white;
+  border-radius: 12px;
+  padding: 2rem;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  text-align: center;
+}
+
+.service-box:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+}
+
+.service-box img {
+  width: 90px;
+  height: 90px;
+  object-fit: contain;
+}
+
+.service-box h2 {
+  color: #2e7d32;
+  font-size: 1.5rem;
+  margin-bottom: 1rem;
+}
+
+.service-box p {
+  color: #555;
+  line-height: 1.6;
+  font-size: 0.95rem;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .service-box-section {
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .service-box {
+    width: 100%;
+    max-width: 400px;
+  }
+}
+
+@media (max-width: 480px) {
+  .service-box {
+    padding: 1.5rem;
+  }
+
+  .service-box img {
+    width: 80px;
+    height: 80px;
+  }
+
+  .service-box h2 {
+    font-size: 1.3rem;
+  }
+}
