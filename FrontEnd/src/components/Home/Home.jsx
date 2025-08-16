@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import "./Home.css";
+import Footer from "../Footer/Footer";
 import BannerImg1 from "./Home-Images/BannerImg1.jpg";
 import BannerImg2 from "./Home-Images/BannerImg2.jpg";
 import BannerImg3 from "./Home-Images/BannerImg3.jpg";
@@ -482,6 +483,7 @@ function Home() {
           </div>
         </div>
       </div>
+      <Footer />
     </div>
   );
 }
