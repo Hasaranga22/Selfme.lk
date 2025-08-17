@@ -1,11 +1,10 @@
 const express = require("express");
 const mongoose = require("mongoose");
 const app = express();
-
+const itemRoutes = require("./Routes/ItemRoutes");
 //Middleware
-app.use("/", (req, res, next) => {
-  res.send("It is working");
-});
+app.use(express.json());
+app.use("/items", itemRoutes);
 
 mongoose
   .connect(

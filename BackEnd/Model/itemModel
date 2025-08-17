@@ -1,0 +1,33 @@
+const mongoose = require("mongoose");
+
+const itemSchema = new mongoose.Schema(
+  {
+    serial_number: {
+      type: String,
+    },
+    item_name: {
+      type: String,
+    },
+    item_image: {
+      type: String,
+    },
+    category: {
+      type: String,
+    },
+    quantity_in_stock: {
+      type: Number,
+    },
+    supplier_id: {
+      type: String,
+    },
+
+    min_stock_level: {
+      type: Number,
+    },
+  },
+  {
+    timestamps: true, // keeps createdAt & updatedAt
+  }
+);
+
+module.exports = mongoose.model("Item", itemSchema);
