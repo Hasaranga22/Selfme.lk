@@ -1,0 +1,136 @@
+/* ===== Isolated Inventory Navbar Styles ===== */
+#inv-nav.inv-navbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: #f6fceb;
+  padding: 15px 40px;
+  border-radius: 40px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+  margin: 15px auto;
+  max-width: 1500px;
+  font-family: "Segoe UI", Roboto, sans-serif;
+}
+
+/* Brand/Logo */
+#inv-brand.inv-brand {
+  flex: 0 0 auto;
+}
+
+#inv-logo.inv-logo-link {
+  color: #1b5e20;
+  font-size: 1.8rem;
+  font-weight: 600;
+  text-decoration: none;
+  transition: color 0.2s ease;
+}
+
+#inv-logo.inv-logo-link:hover {
+  color: #2e7d32;
+}
+
+/* Navigation Links */
+#inv-links.inv-links {
+  display: flex;
+  gap: 35px;
+  flex: 1;
+  justify-content: center;
+}
+
+#inv-links .inv-link {
+  color: #1b5e20;
+  font-size: 1rem;
+  font-weight: 500;
+  text-decoration: none;
+  transition: all 0.2s ease;
+  padding: 8px 12px;
+  border-radius: 20px;
+}
+
+#inv-links .inv-link:hover {
+  background-color: #e8f5e9;
+  color: #2e7d32;
+}
+
+/* Individual Link Hover Effects */
+#inv-add.inv-link:hover,
+#inv-view.inv-link:hover,
+#inv-stock.inv-link:hover,
+#inv-reorder.inv-link:hover,
+#inv-damaged.inv-link:hover,
+#inv-reports.inv-link:hover {
+  background-color: #e8f5e9;
+  color: #2e7d32;
+}
+
+/* Active Link State */
+#inv-links .inv-link.active {
+  background-color: #c8e6c9;
+  color: #1b5e20;
+  font-weight: 600;
+}
+
+/* Sign Out Button */
+#inv-actions.inv-actions {
+  display: flex;
+  align-items: center;
+}
+
+#inv-signout.inv-signout-btn {
+  background: linear-gradient(145deg, #2e7d32, #1b5e20);
+  color: #fff;
+  border: none;
+  padding: 8px 20px;
+  border-radius: 30px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+#inv-signout.inv-signout-btn:hover {
+  transform: scale(1.05);
+  box-shadow: 0 4px 12px rgba(46, 125, 50, 0.3);
+}
+
+/* Responsive Design */
+@media (max-width: 1200px) {
+  #inv-nav.inv-navbar {
+    padding: 15px 30px;
+  }
+
+  #inv-links.inv-links {
+    gap: 25px;
+  }
+}
+
+@media (max-width: 900px) {
+  #inv-nav.inv-navbar {
+    flex-direction: column;
+    gap: 15px;
+    padding: 20px;
+    border-radius: 20px;
+  }
+
+  #inv-links.inv-links {
+    flex-direction: column;
+    gap: 15px;
+    text-align: center;
+  }
+}
+
+@media (max-width: 600px) {
+  #inv-nav.inv-navbar {
+    padding: 15px;
+  }
+
+  #inv-links .inv-link {
+    font-size: 0.95rem;
+    padding: 6px 10px;
+  }
+
+  #inv-signout.inv-signout-btn {
+    padding: 7px 18px;
+    font-size: 0.95rem;
+  }
+}
