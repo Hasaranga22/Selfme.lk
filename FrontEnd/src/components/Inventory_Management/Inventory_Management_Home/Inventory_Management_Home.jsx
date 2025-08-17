@@ -5,7 +5,6 @@ const InventoryManagementHome = () => {
   return (
     <div>
       <InventoryManagementNav />
-      <h1>Inventory Management Dashboard</h1>
     </div>
   );
 };
