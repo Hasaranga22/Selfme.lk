@@ -32,7 +32,7 @@
 /* Navigation Links */
 #inv-links.inv-links {
   display: flex;
-  gap: 35px;
+  gap: 30px;
   flex: 1;
   justify-content: center;
 }

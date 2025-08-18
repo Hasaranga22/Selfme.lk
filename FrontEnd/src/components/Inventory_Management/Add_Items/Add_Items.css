@@ -1,0 +1,91 @@
+/* AddItemForm.css - Updated form container only */
+
+.add-item-container {
+  max-width: 700px; /* Increased from 600px */
+  margin: 3rem auto; /* Increased vertical margin */
+  padding: 2.5rem; /* Increased padding */
+  background: #f8fafc; /* Changed from pure white to softer background */
+  border-radius: 12px; /* Increased border radius */
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.08); /* More subtle shadow */
+  border: 1px solid #e2e8f0; /* Added subtle border */
+}
+
+/* Everything below remains EXACTLY the same as before */
+
+.add-item-container h2 {
+  color: #2d3748;
+  font-size: 1.8rem;
+  margin-bottom: 1.5rem;
+  text-align: center;
+  font-weight: 600;
+}
+
+.add-item-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.form-group label {
+  font-weight: 500;
+  color: #4a5568;
+  font-size: 0.95rem;
+}
+
+.form-group input {
+  padding: 0.75rem 1rem;
+  border: 1px solid #e2e8f0;
+  border-radius: 6px;
+  font-size: 1rem;
+  transition: all 0.3s ease;
+}
+
+.form-group input:focus {
+  outline: none;
+  border-color: #4299e1;
+  box-shadow: 0 0 0 3px rgba(66, 153, 225, 0.2);
+}
+
+.form-submit-btn {
+  background-color: #4299e1;
+  color: white;
+  padding: 0.75rem;
+  border: none;
+  border-radius: 6px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+  margin-top: 0.5rem;
+}
+
+.form-submit-btn:hover {
+  background-color: #3182ce;
+}
+
+/* Responsive adjustments */
+@media (max-width: 640px) {
+  .add-item-container {
+    margin: 1rem;
+    padding: 1.5rem;
+  }
+
+  .add-item-container h2 {
+    font-size: 1.5rem;
+  }
+}
+
+/* Validation styling */
+.form-group input:invalid:not(:placeholder-shown) {
+  border-color: #fc8181;
+}
+
+.form-group input:valid:not(:placeholder-shown) {
+  border-color: #48bb78;
+}

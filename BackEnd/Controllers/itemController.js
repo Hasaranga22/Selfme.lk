@@ -11,14 +11,31 @@ const getAllItems = async (req, res) => {
 };
 
 // Create new item
-const createItem = async (req, res) => {
-  try {
-    const item = new Item(req.body);
-    const savedItem = await item.save();
-    res.status(201).json(savedItem);
-  } catch (err) {
-    res.status(400).json({ message: err.message });
-  }
+const createItem = async (req, res, next) => {
+    const { serial_number, item_name, item_image, category, quantity_in_stock, supplier_id, min_stock_level } = req.body;
+
+    let newItem;
+
+    try {
+        newItem = new Item({ 
+            serial_number, 
+            item_name, 
+            item_image, 
+            category, 
+            quantity_in_stock, 
+            supplier_id, 
+            min_stock_level 
+        });
+        await newItem.save();
+    } catch (err) {
+        console.log(err);
+    }
+
+    if (!newItem) {
+        return res.status(404).json({ message: "Unable to add item" });
+    }
+
+    return res.status(200).json({ item: newItem });
 };
 
 // Get item by ID
