@@ -15,7 +15,7 @@ const InventoryManagementNav = () => {
         <Link to="/addItems" className="inv-link" id="inv-add">
           Add Inventory Items
         </Link>
-        <Link to="/inventory/view" className="inv-link" id="inv-view">
+        <Link to="/viewAllItems" className="inv-link" id="inv-view">
           View All Inventory Items
         </Link>
         <Link to="/inventory/stock-levels" className="inv-link" id="inv-stock">

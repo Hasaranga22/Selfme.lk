@@ -4,6 +4,7 @@ import Home from "./components/Home/Home";
 import { Routes, Route } from "react-router-dom";
 import InventoryManagementHome from "./components/Inventory_Management/Inventory_Management_Home/Inventory_Management_Home";
 import Add_Items from "./components/Inventory_Management/Add_Items/Add_Items";
+import View_All_Items from "./components/Inventory_Management/View_All_Items/View_All_Items";
 
 function App() {
   return (
@@ -15,6 +16,8 @@ function App() {
       <Routes>
         <Route path="/inventory" element={<InventoryManagementHome />} />
         <Route path="/addItems" element={<Add_Items />} />
+        <Route path="/viewAllItems" element
+        ={<View_All_Items />} />
       </Routes>
     </div>
   );

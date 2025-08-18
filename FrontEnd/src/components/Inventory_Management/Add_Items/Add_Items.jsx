@@ -1,18 +1,19 @@
 import React, { useState } from "react";
 import axios from "axios";
 import InventoryManagementNav from "../Inventory_Management_Nav/Inventory_Management_Nav";
-import "./Add_Items.css"; // Make sure to create this CSS file
+import "./Add_Items.css";
 
 const Add_Items = () => {
   const [formData, setFormData] = useState({
     serial_number: "",
     item_name: "",
-    item_image: "",
     category: "",
     quantity_in_stock: "",
     supplier_id: "",
     min_stock_level: "",
   });
+
+  const [itemImage, setItemImage] = useState(null);
 
   const handleChange = (e) => {
     setFormData({
@@ -21,22 +22,38 @@ const Add_Items = () => {
     });
   };
 
+  const handleFileChange = (e) => {
+    setItemImage(e.target.files[0]);
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const res = await axios.post("http://localhost:5000/items", formData);
+      const data = new FormData();
+      Object.keys(formData).forEach((key) => {
+        data.append(key, formData[key]);
+      });
+      if (itemImage) {
+        data.append("item_image", itemImage); // important: matches multer field name
+      }
+
+      const res = await axios.post("http://localhost:5000/items", data, {
+        headers: { "Content-Type": "multipart/form-data" },
+      });
+
       alert("Item added successfully!");
       console.log(res.data);
-      // Reset form after successful submission
+
+      // Reset form
       setFormData({
         serial_number: "",
         item_name: "",
-        item_image: "",
         category: "",
         quantity_in_stock: "",
         supplier_id: "",
         min_stock_level: "",
       });
+      setItemImage(null);
     } catch (error) {
       alert("Error adding item");
       console.error(error);
@@ -76,14 +93,13 @@ const Add_Items = () => {
           </div>
 
           <div className="form-group">
-            <label htmlFor="item_image">Item Image URL</label>
+            <label htmlFor="item_image">Upload Item Image</label>
             <input
-              type="text"
+              type="file"
               id="item_image"
               name="item_image"
-              placeholder="https://example.com/image.jpg"
-              value={formData.item_image}
-              onChange={handleChange}
+              accept="image/*"
+              onChange={handleFileChange}
               required
             />
           </div>
