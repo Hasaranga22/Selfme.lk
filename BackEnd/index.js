@@ -20,6 +20,7 @@ mongoose
   .then(() => console.log("Connected to Mongo DB"))
   .then(() => {
     app.listen(5000);
+    console.log("App listining on port 5000")
   })
 
   .catch((err) => console.log(err));

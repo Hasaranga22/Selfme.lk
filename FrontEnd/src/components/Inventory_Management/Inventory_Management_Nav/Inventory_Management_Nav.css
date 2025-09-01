@@ -10,6 +10,7 @@
   margin: 15px auto;
   max-width: 1500px;
   font-family: "Segoe UI", Roboto, sans-serif;
+  position: relative;
 }
 
 /* Brand/Logo */
@@ -35,9 +36,18 @@
   gap: 30px;
   flex: 1;
   justify-content: center;
+  list-style: none;
+  margin: 0;
+  padding: 0;
 }
 
-#inv-links .inv-link {
+/* Dropdown Styling */
+#inv-links .dropdown {
+  position: relative;
+  display: inline-block;
+}
+
+#inv-links .dropbtn {
   color: #1b5e20;
   font-size: 1rem;
   font-weight: 500;
@@ -45,29 +55,47 @@
   transition: all 0.2s ease;
   padding: 8px 12px;
   border-radius: 20px;
+  cursor: pointer;
+  background: none;
+  border: none;
+  font-family: inherit;
 }
 
-#inv-links .inv-link:hover {
+#inv-links .dropbtn:hover {
   background-color: #e8f5e9;
   color: #2e7d32;
 }
 
-/* Individual Link Hover Effects */
-#inv-add.inv-link:hover,
-#inv-view.inv-link:hover,
-#inv-stock.inv-link:hover,
-#inv-reorder.inv-link:hover,
-#inv-damaged.inv-link:hover,
-#inv-reports.inv-link:hover {
-  background-color: #e8f5e9;
-  color: #2e7d32;
+#inv-links .dropdown-content {
+  display: none;
+  position: absolute;
+  background-color: white;
+  min-width: 220px;
+  box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.1);
+  z-index: 1;
+  border-radius: 8px;
+  overflow: hidden;
+  top: 100%;
+  left: 0;
+  margin-top: 5px;
 }
 
-/* Active Link State */
-#inv-links .inv-link.active {
-  background-color: #c8e6c9;
+#inv-links .dropdown-content a {
   color: #1b5e20;
-  font-weight: 600;
+  padding: 12px 16px;
+  text-decoration: none;
+  display: block;
+  font-size: 0.95rem;
+  transition: all 0.2s ease;
+}
+
+#inv-links .dropdown-content a:hover {
+  background-color: #e8f5e9;
+  color: #2e7d32;
+}
+
+#inv-links .dropdown:hover .dropdown-content {
+  display: block;
 }
 
 /* Sign Out Button */
@@ -117,6 +145,12 @@
     gap: 15px;
     text-align: center;
   }
+  
+  #inv-links .dropdown-content {
+    left: 50%;
+    transform: translateX(-50%);
+    min-width: 200px;
+  }
 }
 
 @media (max-width: 600px) {
@@ -124,7 +158,7 @@
     padding: 15px;
   }
 
-  #inv-links .inv-link {
+  #inv-links .dropbtn {
     font-size: 0.95rem;
     padding: 6px 10px;
   }
@@ -132,5 +166,14 @@
   #inv-signout.inv-signout-btn {
     padding: 7px 18px;
     font-size: 0.95rem;
+  }
+  
+  #inv-links .dropdown-content {
+    min-width: 180px;
+  }
+  
+  #inv-links .dropdown-content a {
+    padding: 10px 14px;
+    font-size: 0.9rem;
   }
 }

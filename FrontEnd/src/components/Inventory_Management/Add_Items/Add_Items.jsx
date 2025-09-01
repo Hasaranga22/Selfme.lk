@@ -15,6 +15,19 @@ const Add_Items = () => {
 
   const [itemImage, setItemImage] = useState(null);
 
+  // Categories for dropdown
+  const categories = [
+    "Solar Panels",
+    "Solar Batteries",
+    "Solar Inverters",
+    "Solar Controllers",
+    "Solar Wires & Cables",
+    "Mounting Structures & Accessories",
+    "Solar Lights & Devices",
+    "Solar Pumps & Appliances",
+    "Monitoring & Miscellaneous Accessories",
+  ];
+
   const handleChange = (e) => {
     setFormData({
       ...formData,
@@ -34,7 +47,7 @@ const Add_Items = () => {
         data.append(key, formData[key]);
       });
       if (itemImage) {
-        data.append("item_image", itemImage); // important: matches multer field name
+        data.append("item_image", itemImage);
       }
 
       const res = await axios.post("http://localhost:5000/items", data, {
@@ -106,15 +119,20 @@ const Add_Items = () => {
 
           <div className="form-group">
             <label htmlFor="category">Category</label>
-            <input
-              type="text"
+            <select
               id="category"
               name="category"
-              placeholder="Battery"
               value={formData.category}
               onChange={handleChange}
               required
-            />
+            >
+              <option value="">-- Select Category --</option>
+              {categories.map((cat, index) => (
+                <option key={index} value={cat}>
+                  {cat}
+                </option>
+              ))}
+            </select>
           </div>
 
           <div className="form-group">
