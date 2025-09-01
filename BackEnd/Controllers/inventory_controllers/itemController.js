@@ -1,4 +1,4 @@
-const Item = require("../Model/itemModel");
+const Item = require("../Model/inventory_models/itemModel");
 const fs = require("fs");
 const path = require("path");
 
@@ -81,11 +81,11 @@ const updateItem = async (req, res) => {
 
     // Handle image update if new file was uploaded
     if (file) {
-      // Delete old image if it exists
+      // Delete old image if it exists - FIXED PATH
       if (existingItem.item_image) {
         const oldImagePath = path.join(
           __dirname,
-          "../public/images",
+          "../item_images", // ✅ corrected to lowercase and relative path
           existingItem.item_image
         );
         if (fs.existsSync(oldImagePath)) {
@@ -142,11 +142,11 @@ const deleteItem = async (req, res) => {
       return res.status(404).json({ message: "Item not found" });
     }
 
-    // Delete associated image
+    // Delete associated image - FIXED PATH
     if (item.item_image) {
       const imagePath = path.join(
         __dirname,
-        "../public/images",
+        "../item_images", // ✅ corrected to lowercase and relative path
         item.item_image
       );
       if (fs.existsSync(imagePath)) {

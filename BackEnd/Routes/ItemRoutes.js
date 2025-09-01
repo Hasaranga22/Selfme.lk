@@ -1,13 +1,13 @@
 const express = require("express");
 const router = express.Router();
-const itemController = require("../Controllers/itemController");
+const itemController = require("../Controllers/inventory_controllers/itemController"); // ✅ corrected relative path
 const multer = require("multer");
 const path = require("path");
 
 // Configure storage
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
-    cb(null, path.join(__dirname, "../Item_images"));
+    cb(null, path.join(__dirname, "../item_images")); // ✅ corrected to lowercase and relative path
   },
   filename: (req, file, cb) => {
     cb(null, Date.now() + "-" + file.originalname);
@@ -16,19 +16,11 @@ const storage = multer.diskStorage({
 
 const upload = multer({ storage });
 
-// GET all items
+// Routes
 router.get("/", itemController.getAllItems);
-
-// POST a new item with image upload
 router.post("/", upload.single("item_image"), itemController.createItem);
-
-// GET single item
 router.get("/:id", itemController.getItemById);
-
-// UPDATE item with potential image upload
-router.put("/:id", upload.single("item_image"), itemController.updateItem); // Added upload middleware
-
-// DELETE item
+router.put("/:id", upload.single("item_image"), itemController.updateItem);
 router.delete("/:id", itemController.deleteItem);
 
 module.exports = router;
