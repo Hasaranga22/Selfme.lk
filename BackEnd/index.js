@@ -1,7 +1,7 @@
 const express = require("express");
 const mongoose = require("mongoose");
 const app = express();
-const itemRoutes = require("./Routes/ItemRoutes"); // ✅ lowercase 'i'
+const itemRoutes = require("./Routes/item_routes/ItemRoutes"); // ✅ lowercase 'i'
 const cors = require("cors");
 const path = require("path");
 

@@ -1,6 +1,6 @@
 const express = require("express");
 const router = express.Router();
-const itemController = require("../Controllers/inventory_controllers/itemController"); // ✅ corrected relative path
+const itemController = require("../../Controllers/inventory_controllers/itemController"); // ✅ corrected relative path
 const multer = require("multer");
 const path = require("path");
 

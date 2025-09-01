@@ -1,4 +1,4 @@
-const Item = require("../Model/inventory_models/itemModel");
+const Item = require("../../Model/inventory_models/itemModel");
 const fs = require("fs");
 const path = require("path");
 
