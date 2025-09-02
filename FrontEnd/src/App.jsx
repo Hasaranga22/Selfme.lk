@@ -7,6 +7,7 @@ import Add_Items from "./components/Inventory_Management/Add_Items/Add_Items";
 import View_All_Items from "./components/Inventory_Management/View_All_Items/View_All_Items";
 import Update_Items from "./components/Inventory_Management/Update_Items/Update_Items"
 import View_Stock_Levels from "./components/Inventory_Management/View_Stock_levels/View_Stock_levels";
+import Re_Order from "./components/Inventory_Management/Re_Order/Re_Order";
 
 function App() {
   return (
@@ -21,6 +22,7 @@ function App() {
         <Route path="/viewAllItems" element={<View_All_Items />} />
         <Route path="/updateItem/:id" element={<Update_Items />} />
         <Route path="/stocklevels" element={<View_Stock_Levels />} />
+        <Route path="/reorderlevels" element={<Re_Order />} />
 
       </Routes>
     </div>
