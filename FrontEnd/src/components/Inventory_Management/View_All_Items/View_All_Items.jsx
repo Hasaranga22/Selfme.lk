@@ -10,12 +10,55 @@ const View_All_Items = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [searchTerm, setSearchTerm] = useState("");
+  const [filters, setFilters] = useState({
+    category: "all",
+    status: "all",
+    sortBy: "createdAt",
+    sortOrder: "desc",
+    lowStock: false,
+  });
+  const [deleteModal, setDeleteModal] = useState({
+    isOpen: false,
+    item: null,
+    loading: false,
+  });
+  const [editModal, setEditModal] = useState({
+    isOpen: false,
+    item: null,
+    loading: false,
+    formData: {},
+    imagePreview: null,
+    newImage: null,
+  });
   const navigate = useNavigate();
 
-  // ✅ Fetch items
+  const categories = [
+    "Solar Panels",
+    "Solar Batteries",
+    "Solar Inverters",
+    "Solar Controllers",
+    "Solar Wires & Cables",
+    "Mounting Structures & Accessories",
+    "Solar Lights & Devices",
+    "Solar Pumps & Appliances",
+    "Monitoring & Miscellaneous Accessories",
+  ];
+
+  const statusOptions = ["Available", "Damaged", "Returned", "Sold Out"];
+
+  // Fetch items with filters
   const fetchItems = async () => {
     try {
-      const res = await axios.get("http://localhost:5000/items");
+      setLoading(true);
+      const params = new URLSearchParams();
+
+      if (filters.category !== "all") params.append("category", filters.category);
+      if (filters.status !== "all") params.append("status", filters.status);
+      if (filters.sortBy) params.append("sortBy", filters.sortBy);
+      if (filters.sortOrder) params.append("sortOrder", filters.sortOrder);
+      if (filters.lowStock) params.append("lowStock", "true");
+
+      const res = await axios.get(`http://localhost:5000/products?${params}`);
       setItems(res.data);
       setFilteredItems(res.data);
     } catch (error) {
@@ -28,55 +71,190 @@ const View_All_Items = () => {
 
   useEffect(() => {
     fetchItems();
-  }, []);
+  }, [filters.category, filters.status, filters.sortBy, filters.sortOrder, filters.lowStock]);
 
-  // ✅ Handle search
+  // Handle search
   useEffect(() => {
-    const results = items.filter(item =>
-      Object.values(item).some(value =>
+    const results = items.filter((item) =>
+      Object.values(item).some((value) =>
         value && value.toString().toLowerCase().includes(searchTerm.toLowerCase())
       )
     );
     setFilteredItems(results);
   }, [searchTerm, items]);
 
-  // ✅ Navigate to update page
-  const handleUpdate = (id) => {
-    navigate(`/updateItem/${id}`);
+  // Handle filter changes
+  const handleFilterChange = (filterType, value) => {
+    setFilters((prev) => ({
+      ...prev,
+      [filterType]: value,
+    }));
   };
 
-  // ✅ Handle delete
-  const handleDelete = async (id) => {
-    const confirmDelete = window.confirm(
-      "Are you sure you want to delete this item?"
-    );
-    if (!confirmDelete) return;
+  // Handle sort changes
+  const handleSortChange = (sortBy, sortOrder) => {
+    setFilters((prev) => ({
+      ...prev,
+      sortBy,
+      sortOrder,
+    }));
+  };
 
-    try {
-      const response = await axios.delete(`http://localhost:5000/items/${id}`);
+  // Open delete confirmation modal
+  const openDeleteModal = (item) => {
+    setDeleteModal({
+      isOpen: true,
+      item: item,
+      loading: false,
+    });
+  };
 
-      if (response.status === 200) {
-        alert("Item deleted successfully!");
-        // Refresh items list
-        fetchItems();
-      }
-    } catch (err) {
-      const errorMessage =
-        err.response?.data?.message ||
-        "Failed to delete item. Please try again.";
-      setError(errorMessage);
-      console.error("Delete error:", {
-        error: err.message,
-        response: err.response?.data,
-      });
+  // Close delete modal
+  const closeDeleteModal = () => {
+    setDeleteModal({
+      isOpen: false,
+      item: null,
+      loading: false,
+    });
+  };
+
+  // Open edit modal
+  const openEditModal = (item) => {
+    setEditModal({
+      isOpen: true,
+      item: item,
+      loading: false,
+      formData: {
+        serial_number: item.serial_number,
+        item_name: item.item_name,
+        category: item.category,
+        description: item.description || "",
+        quantity_in_stock: item.quantity_in_stock,
+        re_order_level: item.re_order_level,
+        supplier_id: item.supplier_id || "",
+        purchase_price: item.purchase_price,
+        selling_price: item.selling_price,
+        status: item.status,
+        product_remark: item.product_remark || "",
+      },
+      imagePreview: item.item_image ? `http://localhost:5000/images/${item.item_image}` : null,
+      newImage: null,
+    });
+  };
+
+  // Close edit modal
+  const closeEditModal = () => {
+    setEditModal({
+      isOpen: false,
+      item: null,
+      loading: false,
+      formData: {},
+      imagePreview: null,
+      newImage: null,
+    });
+  };
+
+  // Handle form input changes
+  const handleInputChange = (e) => {
+    const { name, value } = e.target;
+    setEditModal((prev) => ({
+      ...prev,
+      formData: {
+        ...prev.formData,
+        [name]: value,
+      },
+    }));
+  };
+
+  // Handle image upload
+  const handleImageChange = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      setEditModal((prev) => ({
+        ...prev,
+        newImage: file,
+        imagePreview: URL.createObjectURL(file),
+      }));
     }
   };
+
+  // Handle delete confirmation
+  const handleDeleteConfirm = async () => {
+    if (!deleteModal.item) return;
+
+    try {
+      setDeleteModal((prev) => ({ ...prev, loading: true }));
+
+      await axios.delete(`http://localhost:5000/products/${deleteModal.item._id}`);
+
+      setError(null);
+      alert(`"${deleteModal.item.item_name}" has been deleted successfully!`);
+
+      fetchItems();
+      closeDeleteModal();
+    } catch (err) {
+      const errorMessage = err.response?.data?.message || "Failed to delete item";
+      setError(errorMessage);
+      console.error("Delete error:", err);
+      closeDeleteModal();
+    }
+  };
+
+  // Handle update confirmation
+  const handleUpdateConfirm = async () => {
+    if (!editModal.item) return;
+
+    try {
+      setEditModal((prev) => ({ ...prev, loading: true }));
+
+      const formData = new FormData();
+      
+      // Append all form data
+      Object.keys(editModal.formData).forEach((key) => {
+        formData.append(key, editModal.formData[key]);
+      });
+
+      // Append new image if selected
+      if (editModal.newImage) {
+        formData.append("item_image", editModal.newImage);
+      }
+
+      const response = await axios.put(
+        `http://localhost:5000/products/${editModal.item._id}`,
+        formData,
+        {
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
+        }
+      );
+
+      setError(null);
+      alert(`"${editModal.item.item_name}" has been updated successfully!`);
+
+      fetchItems();
+      closeEditModal();
+    } catch (err) {
+      const errorMessage = err.response?.data?.message || "Failed to update item";
+      setError(errorMessage);
+      console.error("Update error:", err);
+      setEditModal((prev) => ({ ...prev, loading: false }));
+    }
+  };
+
+  // Calculate total value
+  const totalValue = items.reduce(
+    (sum, item) => sum + item.quantity_in_stock * item.selling_price,
+    0
+  );
 
   if (loading) {
     return (
       <div>
         <InventoryManagementNav />
-        <p className="loading-text">Loading items...</p>
+        <div className="loading-container">
+          <p className="loading-text">Loading items...</p>
+        </div>
       </div>
     );
   }
@@ -85,66 +263,150 @@ const View_All_Items = () => {
     <div>
       <InventoryManagementNav />
       <div className="view-items-container">
-        <h2>All Items</h2>
-        
-        {/* Search Bar */}
-        <div className="search-container">
+        <div className="page-header">
+          <h2>Inventory Management</h2>
+          <button className="add-item-btn" onClick={() => navigate("/add-item")}>
+            + Add New Item
+          </button>
+        </div>
+
+        {/* Statistics */}
+        <div className="stats-container">
+          <div className="stat-card">
+            <h3>Total Items</h3>
+            <p className="stat-number">{items.length}</p>
+          </div>
+          <div className="stat-card">
+            <h3>Total Value</h3>
+            <p className="stat-number">LKR {totalValue.toLocaleString()}</p>
+          </div>
+          <div className="stat-card">
+            <h3>Low Stock Items</h3>
+            <p className="stat-number">
+              {items.filter((item) => item.quantity_in_stock <= item.re_order_level).length}
+            </p>
+          </div>
+        </div>
+
+        {/* Filters and Search */}
+        <div className="filters-container">
           <div className="search-box">
             <input
               type="text"
-              placeholder="Search items by name, category, serial number..."
+              placeholder="Search items..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               className="search-input"
             />
-            <span className="search-icon"></span>
+            <span className="search-icon">🔍</span>
           </div>
-          <div className="search-results-count">
-            {filteredItems.length} {filteredItems.length === 1 ? 'item' : 'items'} found
+
+          <div className="filter-group">
+            <select
+              value={filters.category}
+              onChange={(e) => handleFilterChange("category", e.target.value)}
+            >
+              <option value="all">All Categories</option>
+              {categories.map((cat) => (
+                <option key={cat} value={cat}>
+                  {cat}
+                </option>
+              ))}
+            </select>
+
+            <select
+              value={filters.status}
+              onChange={(e) => handleFilterChange("status", e.target.value)}
+            >
+              <option value="all">All Status</option>
+              {statusOptions.map((status) => (
+                <option key={status} value={status}>
+                  {status}
+                </option>
+              ))}
+            </select>
+
+            <select
+              value={filters.sortBy}
+              onChange={(e) => handleSortChange(e.target.value, filters.sortOrder)}
+            >
+              <option value="createdAt">Sort by Date</option>
+              <option value="item_name">Sort by Name</option>
+              <option value="selling_price">Sort by Price</option>
+              <option value="quantity_in_stock">Sort by Stock</option>
+            </select>
+
+            <label className="checkbox-label">
+              <input
+                type="checkbox"
+                checked={filters.lowStock}
+                onChange={(e) => handleFilterChange("lowStock", e.target.checked)}
+              />
+              Show Low Stock Only
+            </label>
           </div>
         </div>
-        
-        {error && <p className="error-text">{error}</p>}
+
+        {error && <div className="error-message">{error}</div>}
+
+        {/* Items Grid */}
         <div className="items-grid">
           {filteredItems.length > 0 ? (
             filteredItems.map((item) => (
               <div key={item._id} className="item-card">
-                <img
-                  src={`http://localhost:5000/images/${item.item_image}`}
-                  alt={item.item_name}
-                  className="item-image"
-                />
-                <div className="item-details">
-                  <h3>{item.item_name}</h3>
-                  <p>
-                    <strong>Serial:</strong> {item.serial_number}
-                  </p>
-                  <p>
-                    <strong>Category:</strong> {item.category}
-                  </p>
-                  <p>
-                    <strong>In Stock:</strong> {item.quantity_in_stock}
-                  </p>
-                  <p>
-                    <strong>Supplier:</strong> {item.supplier_id}
-                  </p>
-                  <p>
-                    <strong>Min Stock:</strong> {item.min_stock_level}
-                  </p>
+                <div className="item-image-container">
+                  <img
+                    src={
+                      item.item_image
+                        ? `http://localhost:5000/images/${item.item_image}`
+                        : "/placeholder-image.png"
+                    }
+                    alt={item.item_name}
+                    className="item-image"
+                    onError={(e) => {
+                      e.target.src = "/placeholder-image.png";
+                    }}
+                  />
+                  {item.quantity_in_stock <= item.re_order_level && (
+                    <div className="low-stock-badge">Low Stock</div>
+                  )}
                 </div>
-                {/* ✅ Update + Delete buttons */}
-                <div className="item-actions">
-                  <button
-                    className="update-btn"
-                    onClick={() => handleUpdate(item._id)}
-                  >
-                    Update
-                  </button>
 
-                  <button
-                    className="delete-btn"
-                    onClick={() => handleDelete(item._id)}
-                  >
+                <div className="item-details">
+                  <h3 className="item-name">{item.item_name}</h3>
+                  <p className="item-serial">SN: {item.serial_number}</p>
+                  <p className="item-category">{item.category}</p>
+
+                  <div className="item-stock-info">
+                    <span className="stock-quantity">{item.quantity_in_stock} in stock</span>
+                    <span className="reorder-level">Reorder at: {item.re_order_level}</span>
+                  </div>
+
+                  <div className="item-pricing">
+                    <span className="selling-price">
+                      LKR {item.selling_price?.toLocaleString()}
+                    </span>
+                    <span className="cost-price">
+                      Cost: LKR {item.purchase_price?.toLocaleString()}
+                    </span>
+                  </div>
+
+                  <div className="item-status">
+                    <span className={`status-badge status-${item.status.toLowerCase()}`}>
+                      {item.status}
+                    </span>
+                  </div>
+
+                  {item.product_remark && (
+                    <p className="item-remark">Remark: {item.product_remark}</p>
+                  )}
+                </div>
+
+                <div className="item-actions">
+                  <button className="btn-update" onClick={() => openEditModal(item)}>
+                    Edit
+                  </button>
+                  <button className="btn-delete" onClick={() => openDeleteModal(item)}>
                     Delete
                   </button>
                 </div>
@@ -154,16 +416,255 @@ const View_All_Items = () => {
             <div className="no-items-found">
               <p>No items found{searchTerm && ` matching "${searchTerm}"`}.</p>
               {searchTerm && (
-                <button 
-                  className="clear-search-btn"
-                  onClick={() => setSearchTerm("")}
-                >
+                <button className="btn-clear-search" onClick={() => setSearchTerm("")}>
                   Clear Search
                 </button>
               )}
             </div>
           )}
         </div>
+
+        {/* Delete Confirmation Modal */}
+        {deleteModal.isOpen && (
+          <div className="modal-overlay">
+            <div className="modal-content">
+              <div className="modal-header">
+                <h3>Confirm Delete</h3>
+                <button className="modal-close" onClick={closeDeleteModal}>
+                  ×
+                </button>
+              </div>
+
+              <div className="modal-body">
+                <p>Are you sure you want to delete this item?</p>
+                <div className="item-to-delete">
+                  <strong>{deleteModal.item?.item_name}</strong>
+                  <br />
+                  <span>Serial: {deleteModal.item?.serial_number}</span>
+                  <br />
+                  <span>Category: {deleteModal.item?.category}</span>
+                </div>
+                <p className="warning-text">
+                  ⚠️ This action cannot be undone. All item data will be permanently deleted.
+                </p>
+              </div>
+
+              <div className="modal-actions">
+                <button className="btn-cancel" onClick={closeDeleteModal} disabled={deleteModal.loading}>
+                  Cancel
+                </button>
+                <button
+                  className="btn-confirm-delete"
+                  onClick={handleDeleteConfirm}
+                  disabled={deleteModal.loading}
+                >
+                  {deleteModal.loading ? "Deleting..." : "Yes, Delete Item"}
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Edit Item Modal */}
+        {editModal.isOpen && (
+          <div className="modal-overlay">
+            <div className="modal-content edit-modal">
+              <div className="modal-header">
+                <h3>Edit Product: {editModal.item?.item_name}</h3>
+                <button className="modal-close" onClick={closeEditModal}>
+                  ×
+                </button>
+              </div>
+
+              <div className="modal-body">
+                <div className="edit-form">
+                  {/* Image Upload */}
+                  <div className="form-group">
+                    <label>Product Image</label>
+                    <div className="image-upload-container">
+                      <img
+                        src={editModal.imagePreview || "/placeholder-image.png"}
+                        alt="Preview"
+                        className="image-preview"
+                      />
+                      <input
+                        type="file"
+                        accept="image/*"
+                        onChange={handleImageChange}
+                        className="image-upload-input"
+                      />
+                      <button
+                        type="button"
+                        className="btn-upload"
+                        onClick={() => document.querySelector('.image-upload-input').click()}
+                      >
+                        Change Image
+                      </button>
+                    </div>
+                  </div>
+
+                  {/* Basic Information */}
+                  <div className="form-row">
+                    <div className="form-group">
+                      <label>Serial Number *</label>
+                      <input
+                        type="text"
+                        name="serial_number"
+                        value={editModal.formData.serial_number}
+                        onChange={handleInputChange}
+                        required
+                      />
+                    </div>
+                    <div className="form-group">
+                      <label>Product Name *</label>
+                      <input
+                        type="text"
+                        name="item_name"
+                        value={editModal.formData.item_name}
+                        onChange={handleInputChange}
+                        required
+                      />
+                    </div>
+                  </div>
+
+                  <div className="form-row">
+                    <div className="form-group">
+                      <label>Category *</label>
+                      <select
+                        name="category"
+                        value={editModal.formData.category}
+                        onChange={handleInputChange}
+                        required
+                      >
+                        <option value="">Select Category</option>
+                        {categories.map((cat) => (
+                          <option key={cat} value={cat}>
+                            {cat}
+                          </option>
+                        ))}
+                      </select>
+                    </div>
+                    <div className="form-group">
+                      <label>Status *</label>
+                      <select
+                        name="status"
+                        value={editModal.formData.status}
+                        onChange={handleInputChange}
+                        required
+                      >
+                        {statusOptions.map((status) => (
+                          <option key={status} value={status}>
+                            {status}
+                          </option>
+                        ))}
+                      </select>
+                    </div>
+                  </div>
+
+                  <div className="form-group">
+                    <label>Description</label>
+                    <textarea
+                      name="description"
+                      value={editModal.formData.description}
+                      onChange={handleInputChange}
+                      rows="3"
+                    />
+                  </div>
+
+                  {/* Inventory Information */}
+                  <div className="form-row">
+                    <div className="form-group">
+                      <label>Quantity in Stock *</label>
+                      <input
+                        type="number"
+                        name="quantity_in_stock"
+                        value={editModal.formData.quantity_in_stock}
+                        onChange={handleInputChange}
+                        min="0"
+                        required
+                      />
+                    </div>
+                    <div className="form-group">
+                      <label>Re-order Level *</label>
+                      <input
+                        type="number"
+                        name="re_order_level"
+                        value={editModal.formData.re_order_level}
+                        onChange={handleInputChange}
+                        min="0"
+                        required
+                      />
+                    </div>
+                  </div>
+
+                  <div className="form-group">
+                    <label>Supplier ID</label>
+                    <input
+                      type="number"
+                      name="supplier_id"
+                      value={editModal.formData.supplier_id}
+                      onChange={handleInputChange}
+                      min="1"
+                    />
+                  </div>
+
+                  {/* Pricing Information */}
+                  <div className="form-row">
+                    <div className="form-group">
+                      <label>Purchase Price (LKR) *</label>
+                      <input
+                        type="number"
+                        name="purchase_price"
+                        value={editModal.formData.purchase_price}
+                        onChange={handleInputChange}
+                        min="0"
+                        step="0.01"
+                        required
+                      />
+                    </div>
+                    <div className="form-group">
+                      <label>Selling Price (LKR) *</label>
+                      <input
+                        type="number"
+                        name="selling_price"
+                        value={editModal.formData.selling_price}
+                        onChange={handleInputChange}
+                        min="0"
+                        step="0.01"
+                        required
+                      />
+                    </div>
+                  </div>
+
+                  {/* Remarks */}
+                  <div className="form-group">
+                    <label>Remarks</label>
+                    <textarea
+                      name="product_remark"
+                      value={editModal.formData.product_remark}
+                      onChange={handleInputChange}
+                      rows="3"
+                      placeholder="Additional notes or comments..."
+                    />
+                  </div>
+                </div>
+              </div>
+
+              <div className="modal-actions">
+                <button className="btn-cancel" onClick={closeEditModal} disabled={editModal.loading}>
+                  Cancel
+                </button>
+                <button
+                  className="btn-confirm-update"
+                  onClick={handleUpdateConfirm}
+                  disabled={editModal.loading}
+                >
+                  {editModal.loading ? "Updating..." : "Update Item"}
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );

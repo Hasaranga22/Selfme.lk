@@ -1,16 +1,13 @@
 const mongoose = require("mongoose");
 
-const itemSchema = new mongoose.Schema(
+const productSchema = new mongoose.Schema(
   {
     serial_number: {
       type: String,
       required: true,
+      unique: true,
     },
     item_name: {
-      type: String,
-      required: true,
-    },
-    item_image: {
       type: String,
       required: true,
     },
@@ -18,23 +15,42 @@ const itemSchema = new mongoose.Schema(
       type: String,
       required: true,
     },
+    item_image: {
+      type: String, 
+    },
+    description: {
+      type: String,
+    },
     quantity_in_stock: {
       type: Number,
       required: true,
     },
-    supplier_id: {
-      type: String,
-      required: true,
-    },
-
-    min_stock_level: {
+    re_order_level: {
       type: Number,
       required: true,
     },
+    supplier_id: {
+      type: Number, 
+    },
+    purchase_price: {
+      type: Number,
+      required: true,
+    },
+    selling_price: {
+      type: Number,
+      required: true,
+    },
+    status: {
+      type: String,
+      default: "Available",
+    },
+    product_remark: {
+      type: String, 
+    },
   },
   {
-    timestamps: true, // keeps createdAt & updatedAt
+    timestamps: true, 
   }
 );
 
-module.exports = mongoose.model("Item", itemSchema);
+module.exports = mongoose.model("Product", productSchema);

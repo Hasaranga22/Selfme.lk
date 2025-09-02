@@ -4,18 +4,19 @@ const app = express();
 const itemRoutes = require("./Routes/item_routes/ItemRoutes"); // ✅ lowercase 'i'
 const cors = require("cors");
 const path = require("path");
+const multer = require("multer"); // Add multer
 
 // Middleware
 app.use(cors());
 app.use(express.json());
-app.use("/items", itemRoutes);
+app.use("/products", itemRoutes);
 
 // Serve static files from item_images folder
 app.use("/images", express.static(path.join(__dirname, "item_images")));
 
 mongoose
   .connect(
-    "mongodb+srv://adminSelfme:P40YIFy04Am8rnDe@cluster0.4bp3tta.mongodb.net/inventoryDBs"
+    "mongodb+srv://adminSelfme:P40YIFy04Am8rnDe@cluster0.4bp3tta.mongodb.net/selfmedb"
   )
   .then(() => console.log("Connected to Mongo DB"))
   .then(() => {

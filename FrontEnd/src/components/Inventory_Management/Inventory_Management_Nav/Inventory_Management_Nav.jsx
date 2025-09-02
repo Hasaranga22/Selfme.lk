@@ -22,12 +22,12 @@ const InventoryManagementNav = () => {
             <Link to="/addItems">Add Items</Link>
             <Link to="/viewAllItems">View / Update / Delete Items</Link>
             <Link to="/stocklevels">Stock Levels</Link>
-            <Link to="/inventory/reorder-levels">Reorder Alerts</Link>
+            <Link to="/reorderlevels">Reorder Alerts</Link>
           </div>
         </li>
 
         {/* Suppliers */}
-        <li className="dropdown">
+        {/* <li className="dropdown">
           <span className="dropbtn">Suppliers ▾</span>
           <div className="dropdown-content">
             <Link to="/suppliers/add">Add Supplier</Link>
@@ -35,7 +35,7 @@ const InventoryManagementNav = () => {
             <Link to="/suppliers/rating">Rate Suppliers</Link>
             <Link to="/suppliers/blacklist">Blacklist Suppliers</Link>
           </div>
-        </li>
+        </li> */}
 
         {/* Requests */}
         <li className="dropdown">
