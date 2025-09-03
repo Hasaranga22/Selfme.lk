@@ -1,0 +1,328 @@
+/* GENERAL PAGE STYLING */
+#idr_inventory-damaged-return {
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  background-color: #f7f8fa;
+  padding: 20px;
+  min-height: 100vh;
+}
+
+/* PAGE HEADER */
+.idr_page-header {
+  text-align: center;
+  margin-bottom: 25px;
+}
+.idr_page-header h2 {
+  font-size: 28px;
+  margin-bottom: 5px;
+  color: #333;
+}
+.idr_page-subtitle {
+  font-size: 16px;
+  color: #555;
+}
+
+/* STATISTICS CARDS */
+.idr_stats-container {
+  display: flex;
+  gap: 20px;
+  margin-bottom: 25px;
+  flex-wrap: wrap;
+}
+.idr_stat-card {
+  flex: 1;
+  min-width: 180px;
+  display: flex;
+  align-items: center;
+  background-color: #fff;
+  padding: 15px 20px;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+  transition: transform 0.2s ease;
+}
+.idr_stat-card:hover {
+  transform: translateY(-3px);
+}
+.idr_stat-icon {
+  font-size: 28px;
+  margin-right: 15px;
+}
+.idr_stat-content h3 {
+  font-size: 16px;
+  color: #666;
+  margin: 0 0 5px;
+}
+.idr_stat-number {
+  font-size: 20px;
+  font-weight: bold;
+  color: #222;
+}
+
+/* FILTERS & SEARCH */
+.idr_filters-container {
+  display: flex;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  margin-bottom: 25px;
+  gap: 15px;
+}
+.idr_search-box {
+  position: relative;
+  flex: 1;
+  min-width: 250px;
+}
+.idr_search-input {
+  width: 95%;
+  padding: 10px 35px 10px 12px;
+  border-radius: 8px;
+  border: 1px solid #ccc;
+  font-size: 14px;
+}
+.idr_search-icon {
+  position: absolute;
+  top: 50%;
+  right: 12px;
+  transform: translateY(-50%);
+  font-size: 16px;
+  color: #888;
+}
+.idr_filter-group {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+.idr_filter-group select {
+  padding: 8px 12px;
+  border-radius: 6px;
+  border: 1px solid #ccc;
+  font-size: 14px;
+  cursor: pointer;
+}
+
+/* ERROR MESSAGE */
+.idr_error-message {
+  background-color: #fde2e2;
+  color: #a80000;
+  padding: 10px 15px;
+  border-radius: 8px;
+  margin-bottom: 20px;
+  text-align: center;
+  font-weight: bold;
+}
+
+/* ITEMS GRID */
+.idr_items-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill,minmax(250px,1fr));
+  gap: 20px;
+}
+.idr_item-card {
+  background-color: #fff;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 3px 10px rgba(0,0,0,0.08);
+  display: flex;
+  flex-direction: column;
+  transition: transform 0.2s ease;
+}
+.idr_item-card:hover {
+  transform: translateY(-3px);
+}
+
+/* ITEM IMAGE & STATUS BADGE */
+.idr_item-image-container {
+  position: relative;
+}
+.idr_item-image {
+  width: 100%;
+  height: 180px;
+  object-fit: cover;
+}
+.idr_status-badge {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  padding: 4px 8px;
+  border-radius: 6px;
+  font-weight: bold;
+  color: #fff;
+  font-size: 12px;
+  text-transform: uppercase;
+}
+.idr_status-damaged { background-color: #e74c3c; }
+.idr_status-returned { background-color: #f39c12; }
+.idr_status-available { background-color: #27ae60; }
+
+/* ITEM DETAILS */
+.idr_item-details {
+  padding: 12px 15px;
+  flex: 1;
+}
+.idr_item-name {
+  font-size: 16px;
+  font-weight: bold;
+  margin-bottom: 4px;
+}
+.idr_item-serial, .idr_item-category, .idr_item-description, .idr_item-remark {
+  font-size: 13px;
+  color: #555;
+  margin: 2px 0;
+}
+.idr_item-stock-info {
+  margin: 6px 0;
+}
+.idr_item-pricing {
+  display: flex;
+  justify-content: space-between;
+  margin: 6px 0;
+  font-size: 13px;
+}
+.idr_cost-price { font-weight: bold; color: #333; }
+.idr_loss-value { color: #e74c3c; font-weight: bold; }
+
+/* ITEM ACTION BUTTON */
+.idr_item-actions {
+  padding: 10px 15px;
+  background-color: #f1f1f1;
+  display: flex;
+  justify-content: flex-end;
+}
+.idr_btn-update {
+  padding: 6px 14px;
+  border-radius: 6px;
+  border: none;
+  background-color: #3498db;
+  color: #fff;
+  cursor: pointer;
+  font-weight: bold;
+  transition: background-color 0.2s ease;
+}
+.idr_btn-update:hover {
+  background-color: #2980b9;
+}
+
+/* EMPTY STATE */
+.idr_no-items-found {
+  text-align: center;
+  padding: 50px;
+  background-color: #fff;
+  border-radius: 12px;
+}
+.idr_empty-state-icon {
+  font-size: 50px;
+  margin-bottom: 15px;
+}
+.idr_btn-clear-search {
+  margin-top: 15px;
+  padding: 8px 18px;
+  border-radius: 6px;
+  border: none;
+  background-color: #3498db;
+  color: #fff;
+  cursor: pointer;
+  font-weight: bold;
+}
+.idr_btn-clear-search:hover {
+  background-color: #2980b9;
+}
+
+/* MODAL STYLING */
+.idr_modal-overlay {
+  position: fixed;
+  top:0;
+  left:0;
+  right:0;
+  bottom:0;
+  background: rgba(0,0,0,0.5);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  z-index: 9999;
+}
+.idr_modal {
+  background: #fff;
+  padding: 25px 30px;
+  border-radius: 12px;
+  max-width: 400px;
+  width: 100%;
+  box-shadow: 0 5px 20px rgba(0,0,0,0.2);
+}
+.idr_modal h3 {
+  margin-bottom: 10px;
+  color: #333;
+}
+.idr_modal p {
+  margin-bottom: 15px;
+  color: #555;
+  font-size: 14px;
+}
+.idr_form-group {
+  margin-bottom: 15px;
+}
+.idr_form-group label {
+  display:block;
+  font-weight: bold;
+  margin-bottom: 5px;
+  color: #333;
+}
+.idr_form-group select,
+.idr_form-group textarea {
+  width: 100%;
+  padding: 8px 10px;
+  border-radius: 6px;
+  border: 1px solid #ccc;
+  font-size: 14px;
+}
+.idr_remark-textarea { resize: vertical; }
+
+/* MODAL BUTTONS */
+.idr_modal-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+}
+.idr_btn-cancel {
+  padding: 6px 12px;
+  border-radius: 6px;
+  border: none;
+  background-color: #ccc;
+  font-weight: bold;
+  cursor: pointer;
+}
+.idr_btn-cancel:hover { background-color: #999; }
+.idr_btn-confirm-update {
+  padding: 6px 12px;
+  border-radius: 6px;
+  border: none;
+  background-color: #3498db;
+  color: #fff;
+  font-weight: bold;
+  cursor: pointer;
+}
+.idr_btn-confirm-update:hover { background-color: #2980b9; }
+
+/* LOADING PAGE */
+#idr_loading-page {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 80vh;
+}
+.idr_loading-container {
+  text-align: center;
+}
+.idr_loading-text {
+  font-size: 18px;
+  color: #555;
+}
+
+/* RESPONSIVE */
+@media (max-width: 768px) {
+  .idr_filters-container {
+    flex-direction: column;
+    gap: 10px;
+  }
+  .idr_stats-container {
+    flex-direction: column;
+  }
+}
