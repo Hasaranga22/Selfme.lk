@@ -36,25 +36,23 @@ const InventoryManagementNav = () => {
             <Link to="/suppliers/blacklist">Blacklist Suppliers</Link>
           </div>
         </li> */}
-
-        {/* Requests */}
-        <li className="dropdown">
-          <span className="dropbtn">Requests ▾</span>
-          <div className="dropdown-content">
-            <Link to="/requests/pending">Pending Requests</Link>
-            <Link to="/requests/approve">Approve / Reject Requests</Link>
-            <Link to="/requests/supply">Supply Items</Link>
-            <Link to="/requests/reports">Request Reports</Link>
-          </div>
-        </li>
-
+        
         {/* Damage & Returns */}
         <li className="dropdown">
           <span className="dropbtn">Damage & Returns ▾</span>
           <div className="dropdown-content">
-            <Link to="/damage/add">Mark Damaged Item</Link>
-            <Link to="/returns/add">Return to Supplier</Link>
-            <Link to="/damage/reports">Damage Reports</Link>
+            <Link to="/damage_return_add">Mark Damaged Item</Link>
+            <Link to="/returns_to_supplier">Return to Supplier</Link>
+          </div>
+        </li>
+
+
+        {/* Requests */}
+        <li className="dropdown">
+          <span className="dropbtn">Order Requests ▾</span>
+          <div className="dropdown-content">
+            <Link to="/product_request">Product Request</Link>
+            <Link to="/product_status">Approve / Reject Requests</Link>
           </div>
         </li>
 
