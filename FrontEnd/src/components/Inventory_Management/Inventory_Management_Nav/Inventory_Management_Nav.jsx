@@ -1,81 +1,179 @@
-import React from "react";
+// InventoryManagementNav.jsx
+import React, { useState } from "react";
 import { Link } from "react-router-dom";
 import "./Inventory_Management_Nav.css";
 
 const InventoryManagementNav = () => {
+  const [activeDropdown, setActiveDropdown] = useState(null);
+
+  const toggleDropdown = (index) => {
+    setActiveDropdown((prev) => (prev === index ? null : index));
+  };
+
   return (
-    <nav className="inv-navbar" id="inv-nav">
-      {/* Brand */}
-      <div className="inv-brand" id="inv-brand">
-        <Link to="/inventory" className="inv-logo-link" id="inv-logo">
+    <aside className="inv-nav">
+      <div className="inv-nav__brand">
+        <Link to="/inventory" className="inv-nav__brand-link">
           Selfme.lk
         </Link>
       </div>
 
-      {/* Nav Links */}
-      <ul className="inv-links" id="inv-links">
+      <nav className="inv-nav__menu" aria-label="Inventory Navigation">
+        <ul className="inv-nav__list">
+          {/* Inventory */}
+          <li className="inv-nav__item">
+            <button
+              className={`inv-nav__header ${
+                activeDropdown === 0 ? "is-active" : ""
+              }`}
+              onClick={() => toggleDropdown(0)}
+              aria-expanded={activeDropdown === 0}
+            >
+              <span>Inventory</span>
+              <span className="inv-nav__arrow">▾</span>
+            </button>
+            <div
+              className={`inv-nav__submenu ${
+                activeDropdown === 0 ? "is-open" : ""
+              }`}
+            >
+              <Link to="/addItems" className="inv-nav__link">
+                Add Items
+              </Link>
+              <Link to="/viewAllItems" className="inv-nav__link">
+                View / Update / Delete Items
+              </Link>
+              <Link to="/stocklevels" className="inv-nav__link">
+                Stock Levels
+              </Link>
+              <Link to="/reorderlevels" className="inv-nav__link">
+                Reorder Alerts
+              </Link>
+              <Link to="/damage_return_add" className="inv-nav__link">
+                Mark Damaged Item
+              </Link>
+            </div>
+          </li>
 
-        {/* Inventory */}
-        <li className="dropdown">
-          <span className="dropbtn">Inventory ▾</span>
-          <div className="dropdown-content">
-            <Link to="/addItems">Add Items</Link>
-            <Link to="/viewAllItems">View / Update / Delete Items</Link>
-            <Link to="/stocklevels">Stock Levels</Link>
-            <Link to="/reorderlevels">Reorder Alerts</Link>
-          </div>
-        </li>
+          {/* Inventory Tracking */}
+          <li className="inv-nav__item">
+            <button
+              className={`inv-nav__header ${
+                activeDropdown === 1 ? "is-active" : ""
+              }`}
+              onClick={() => toggleDropdown(1)}
+              aria-expanded={activeDropdown === 1}
+            >
+              <span>Inventory Tracking</span>
+              <span className="inv-nav__arrow">▾</span>
+            </button>
+            <div
+              className={`inv-nav__submenu ${
+                activeDropdown === 1 ? "is-open" : ""
+              }`}
+            >
+              <Link to="/order_placing" className="inv-nav__link">
+                Place Order
+              </Link>
+              <Link to="/material_outgoings" className="inv-nav__link">
+                Material Outgoings
+              </Link>
+            </div>
+          </li>
 
-        {/* Suppliers */}
-        {/* <li className="dropdown">
-          <span className="dropbtn">Suppliers ▾</span>
-          <div className="dropdown-content">
-            <Link to="/suppliers/add">Add Supplier</Link>
-            <Link to="/suppliers/view">View / Update / Delete Suppliers</Link>
-            <Link to="/suppliers/rating">Rate Suppliers</Link>
-            <Link to="/suppliers/blacklist">Blacklist Suppliers</Link>
-          </div>
-        </li> */}
-        
-        {/* Damage & Returns */}
-        <li className="dropdown">
-          <span className="dropbtn">Damage & Returns ▾</span>
-          <div className="dropdown-content">
-            <Link to="/damage_return_add">Mark Damaged Item</Link>
-            <Link to="/returns_to_supplier">Return to Supplier</Link>
-          </div>
-        </li>
+          {/* Order Requests */}
+          <li className="inv-nav__item">
+            <button
+              className={`inv-nav__header ${
+                activeDropdown === 2 ? "is-active" : ""
+              }`}
+              onClick={() => toggleDropdown(2)}
+              aria-expanded={activeDropdown === 2}
+            >
+              <span>Order Requests</span>
+              <span className="inv-nav__arrow">▾</span>
+            </button>
+            <div
+              className={`inv-nav__submenu ${
+                activeDropdown === 2 ? "is-open" : ""
+              }`}
+            >
+              <Link to="/product_request" className="inv-nav__link">
+                Product Request
+              </Link>
+              <Link to="/product_status" className="inv-nav__link">
+                Approve / Reject Requests
+              </Link>
+            </div>
+          </li>
 
+          {/* Supplier */}
+          <li className="inv-nav__item">
+            <button
+              className={`inv-nav__header ${
+                activeDropdown === 3 ? "is-active" : ""
+              }`}
+              onClick={() => toggleDropdown(3)}
+              aria-expanded={activeDropdown === 3}
+            >
+              <span>Suppliers</span>
+              <span className="inv-nav__arrow">▾</span>
+            </button>
+            <div
+              className={`inv-nav__submenu ${
+                activeDropdown === 3 ? "is-open" : ""
+              }`}
+            >
+              <Link to="/addSupplier" className="inv-nav__link">
+                Add Supplier
+              </Link>
+              <Link to="/viewSuppliers" className="inv-nav__link">
+                View / Update / Delete Suppliers
+              </Link>
+            </div>
+          </li>
 
-        {/* Requests */}
-        <li className="dropdown">
-          <span className="dropbtn">Order Requests ▾</span>
-          <div className="dropdown-content">
-            <Link to="/product_request">Product Request</Link>
-            <Link to="/product_status">Approve / Reject Requests</Link>
-          </div>
-        </li>
+          {/* Reports */}
+          <li className="inv-nav__item">
+            <button
+              className={`inv-nav__header ${
+                activeDropdown === 4 ? "is-active" : ""
+              }`}
+              onClick={() => toggleDropdown(4)}
+              aria-expanded={activeDropdown === 4}
+            >
+              <span>Reports</span>
+              <span className="inv-nav__arrow">▾</span>
+            </button>
+            <div
+              className={`inv-nav__submenu ${
+                activeDropdown === 4 ? "is-open" : ""
+              }`}
+            >
+              <Link to="/reports/stock" className="inv-nav__link">
+                Stock Summary
+              </Link>
+              <Link to="/reports/supplier" className="inv-nav__link">
+                Supplier Report
+              </Link>
+              <Link to="/reports/request" className="inv-nav__link">
+                Request Fulfillment
+              </Link>
+              <Link to="/reports/damage" className="inv-nav__link">
+                Damaged Items Report
+              </Link>
+              <Link to="/reports/valuation" className="inv-nav__link">
+                Inventory Valuation
+              </Link>
+            </div>
+          </li>
+        </ul>
+      </nav>
 
-        {/* Reports */}
-        <li className="dropdown">
-          <span className="dropbtn">Reports ▾</span>
-          <div className="dropdown-content">
-            <Link to="/reports/stock">Stock Summary</Link>
-            <Link to="/reports/supplier">Supplier Report</Link>
-            <Link to="/reports/request">Request Fulfillment</Link>
-            <Link to="/reports/damage">Damaged Items Report</Link>
-            <Link to="/reports/valuation">Inventory Valuation</Link>
-          </div>
-        </li>
-      </ul>
-
-      {/* Actions */}
-      <div className="inv-actions" id="inv-actions">
-        <button className="inv-signout-btn" id="inv-signout">
-          Sign Out
-        </button>
+      <div className="inv-nav__footer">
+        <button className="inv-nav__signout">Sign Out</button>
       </div>
-    </nav>
+    </aside>
   );
 };
 

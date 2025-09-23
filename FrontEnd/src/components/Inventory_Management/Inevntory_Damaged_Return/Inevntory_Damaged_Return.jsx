@@ -112,7 +112,6 @@ const Inevntory_Damaged_Return = () => {
         product_remark: statusModal.remark,
       };
       await axios.put(`http://localhost:5000/products/${statusModal.item._id}`, updateData);
-      alert(`"${statusModal.item.item_name}" status has been updated successfully!`);
       fetchItems();
       closeStatusModal();
     } catch (err) {
@@ -144,39 +143,27 @@ const Inevntory_Damaged_Return = () => {
       <InventoryManagementNav />
       <div className="idr_damaged-return-container">
         <div className="idr_page-header">
-          <h2>🔄 Damaged & Returned Inventory</h2>
-          <p className="idr_page-subtitle">Manage damaged and returned products efficiently</p>
+          <h2>Damaged & Returned Inventory</h2>
+          <p className="idr_page-subtitle">Manage and track products marked as damaged or returned</p>
         </div>
 
         {/* Statistics */}
         <div className="idr_stats-container">
-          <div className="idr_stat-card idr_damaged">
-            <div className="idr_stat-icon">⚠️</div>
-            <div className="idr_stat-content">
-              <h3>Damaged Items</h3>
-              <p className="idr_stat-number">{damagedItems}</p>
-            </div>
+          <div className="idr_stat-card">
+            <h3>Damaged Items</h3>
+            <p className="idr_stat-number">{damagedItems}</p>
           </div>
-          <div className="idr_stat-card idr_returned">
-            <div className="idr_stat-icon">↩️</div>
-            <div className="idr_stat-content">
-              <h3>Returned Items</h3>
-              <p className="idr_stat-number">{returnedItems}</p>
-            </div>
+          <div className="idr_stat-card">
+            <h3>Returned Items</h3>
+            <p className="idr_stat-number">{returnedItems}</p>
           </div>
-          <div className="idr_stat-card idr_total">
-            <div className="idr_stat-icon">📦</div>
-            <div className="idr_stat-content">
-              <h3>Total Items</h3>
-              <p className="idr_stat-number">{totalItems}</p>
-            </div>
+          <div className="idr_stat-card">
+            <h3>Total Items</h3>
+            <p className="idr_stat-number">{totalItems}</p>
           </div>
-          <div className="idr_stat-card idr_value">
-            <div className="idr_stat-icon">💰</div>
-            <div className="idr_stat-content">
-              <h3>Total Value</h3>
-              <p className="idr_stat-number">LKR {totalValue.toLocaleString()}</p>
-            </div>
+          <div className="idr_stat-card">
+            <h3>Total Value</h3>
+            <p className="idr_stat-number">LKR {totalValue.toLocaleString()}</p>
           </div>
         </div>
 
@@ -190,13 +177,11 @@ const Inevntory_Damaged_Return = () => {
               onChange={(e) => setSearchTerm(e.target.value)}
               className="idr_search-input"
             />
-            <span className="idr_search-icon">🔍</span>
           </div>
           <div className="idr_filter-group">
             <select
               value={filters.category}
               onChange={(e) => handleFilterChange("category", e.target.value)}
-              className="idr_filter-category"
             >
               <option value="all">All Categories</option>
               {categories.map((cat) => (
@@ -208,7 +193,6 @@ const Inevntory_Damaged_Return = () => {
             <select
               value={filters.status}
               onChange={(e) => handleFilterChange("status", e.target.value)}
-              className="idr_filter-status"
             >
               <option value="all">All Status</option>
               {statusOptions.map((status) => (
@@ -220,7 +204,6 @@ const Inevntory_Damaged_Return = () => {
             <select
               value={filters.sortBy}
               onChange={(e) => handleSortChange(e.target.value, filters.sortOrder)}
-              className="idr_sort-select"
             >
               <option value="createdAt">Sort by Date</option>
               <option value="item_name">Sort by Name</option>
@@ -236,7 +219,7 @@ const Inevntory_Damaged_Return = () => {
         <div className="idr_items-grid">
           {filteredItems.length > 0 ? (
             filteredItems.map((item) => (
-              <div key={item._id} className={`idr_item-card idr_${item.status.toLowerCase()}`}>
+              <div key={item._id} className={`idr_item-card`}>
                 <div className="idr_item-image-container">
                   <img
                     src={item.item_image ? `http://localhost:5000/images/${item.item_image}` : "/placeholder-image.png"}
@@ -244,7 +227,7 @@ const Inevntory_Damaged_Return = () => {
                     className="idr_item-image"
                     onError={(e) => (e.target.src = "/placeholder-image.png")}
                   />
-                  <div className={`idr_status-badge idr_status-${item.status.toLowerCase()}`}>
+                  <div className={`idr_status-badge ${item.status.toLowerCase()}`}>
                     {item.status}
                   </div>
                 </div>
@@ -252,32 +235,25 @@ const Inevntory_Damaged_Return = () => {
                   <h3 className="idr_item-name">{item.item_name}</h3>
                   <p className="idr_item-serial">SN: {item.serial_number}</p>
                   <p className="idr_item-category">{item.category}</p>
-                  <div className="idr_item-stock-info">
-                    <span className="idr_stock-quantity">{item.quantity_in_stock} units</span>
-                  </div>
-                  <div className="idr_item-pricing">
-                    <span className="idr_cost-price">Cost: LKR {item.purchase_price?.toLocaleString()}</span>
-                    <span className="idr_loss-value">
-                      Potential Loss: LKR {(item.quantity_in_stock * item.purchase_price)?.toLocaleString()}
-                    </span>
-                  </div>
+                  <p className="idr_stock-quantity">{item.quantity_in_stock} units</p>
+                  <p className="idr_cost-price">Cost: LKR {item.purchase_price?.toLocaleString()}</p>
+                  <p className="idr_loss-value">
+                    Loss: LKR {(item.quantity_in_stock * item.purchase_price)?.toLocaleString()}
+                  </p>
                   {item.product_remark && (
-                    <div className="idr_item-remark">
-                      <strong>Reason:</strong> {item.product_remark}
-                    </div>
+                    <p className="idr_item-remark"><strong>Reason:</strong> {item.product_remark}</p>
                   )}
                   {item.description && <p className="idr_item-description">{item.description}</p>}
                 </div>
                 <div className="idr_item-actions">
                   <button className="idr_btn-update" onClick={() => openStatusModal(item)}>
-                    🔄 Update Status
+                    Update Status
                   </button>
                 </div>
               </div>
             ))
           ) : (
             <div className="idr_no-items-found">
-              <div className="idr_empty-state-icon">📭</div>
               <h3>No Damaged or Returned Items Found</h3>
               <p>Currently no items are marked as damaged or returned.</p>
               {searchTerm && (
@@ -298,7 +274,7 @@ const Inevntory_Damaged_Return = () => {
 
               <div className="idr_form-group">
                 <label>Status:</label>
-                <select value={statusModal.newStatus} onChange={handleStatusChange} className="idr_status-select">
+                <select value={statusModal.newStatus} onChange={handleStatusChange}>
                   {statusOptions.map((option) => (
                     <option key={option} value={option}>
                       {option}
@@ -314,7 +290,6 @@ const Inevntory_Damaged_Return = () => {
                   onChange={handleRemarkChange}
                   placeholder="Enter reason for status change..."
                   rows="3"
-                  className="idr_remark-textarea"
                 />
               </div>
 

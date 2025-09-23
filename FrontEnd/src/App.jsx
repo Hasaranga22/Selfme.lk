@@ -11,6 +11,9 @@ import Re_Order from "./components/Inventory_Management/Re_Order/Re_Order";
 import Product_Request from "./components/Inventory_Management/Product_Request/Product_Request";
 import Product_Request_Status from "./components/Inventory_Management/Product_Request_Status/Product_Request_Status";
 import Inevntory_Damaged_Return from "./components/Inventory_Management/Inevntory_Damaged_Return/Inevntory_Damaged_Return";
+import Add_Suppliers from "./components/Inventory_Management/Supplier/Supplier";
+import View_Suppliers from "./components/Inventory_Management/View_Suppliers/View_Suppliers";
+import Order_Place from "./components/Inventory_Management/Order_Place/Order_Place";
 
 function App() {
   return (
@@ -30,7 +33,22 @@ function App() {
         <Route path="/product_request" element={<Product_Request />} />
         <Route path="/product_status" element={<Product_Request_Status />} />
 
-        <Route path="/damage_return_add" element={<Inevntory_Damaged_Return />} />
+        <Route
+          path="/damage_return_add"
+          element={<Inevntory_Damaged_Return />}
+        />
+
+<Route
+          path="/order_placing"
+          element={<Order_Place />}
+        />
+        {/* <Route
+          path="/material_outgoings"
+          element={<Inevntory_Damaged_Return />}
+        /> */}
+
+        <Route path="/addSupplier" element={<Add_Suppliers />} />
+        <Route path="/viewSuppliers" element={<View_Suppliers />} />
       </Routes>
     </div>
   );

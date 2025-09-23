@@ -1,88 +1,139 @@
-/* AddItemForm.css - Updated form container only */
-
+/* Container aligned with sidebar */
 .add-item-container {
-  max-width: 700px; /* Increased from 600px */
-  margin: 3rem auto; /* Increased vertical margin */
-  padding: 2.5rem; /* Increased padding */
-  background: #f8fafc; /* Changed from pure white to softer background */
-  border-radius: 12px; /* Increased border radius */
-  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.08); /* More subtle shadow */
-  border: 1px solid #e2e8f0; /* Added subtle border */
+  max-width: 800px; /* slightly smaller */
+  margin: 2rem auto;
+  margin-left: 400px; /* adjust with sidebar */
+  padding: 1.5rem 1.8rem; /* slightly smaller padding */
+  background: #ffffff;
+  border-radius: 10px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
+  border: 1px solid #e2e8f0;
+  font-family: "Inter", sans-serif;
+  font-size: 0.88rem; /* base font smaller */
 }
 
-/* Everything below remains EXACTLY the same as before */
-
+/* Page Heading */
 .add-item-container h2 {
-  color: #2d3748;
-  font-size: 1.8rem;
-  margin-bottom: 1.5rem;
+  font-size: 1.5rem; /* smaller heading */
+  font-weight: 700;
+  color: #1a202c;
   text-align: center;
-  font-weight: 600;
+  margin-bottom: 1.5rem;
+  border-bottom: 1px solid #edf2f7;
+  padding-bottom: 0.5rem;
 }
 
+/* Section Card */
+.form-section {
+  background: #f9fafb;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  padding: 1rem 1.2rem; /* smaller padding */
+  margin-bottom: 1.2rem;
+}
+
+.form-section h3 {
+  font-size: 0.95rem; /* smaller and professional */
+  font-weight: 600;
+  color: #2d3748;
+  margin-bottom: 0.8rem;
+  border-left: 3px solid #4299e1;
+  padding-left: 0.6rem;
+}
+
+/* Form Layout */
 .add-item-form {
   display: flex;
   flex-direction: column;
-  gap: 1.25rem;
+  gap: 0.9rem; /* reduced gap */
 }
 
+/* Two-column layout for desktop */
+.form-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.8rem;
+}
+
+/* Form Group */
 .form-group {
   display: flex;
   flex-direction: column;
-  gap: 0.5rem;
+  gap: 0.3rem;
 }
 
 .form-group label {
   font-weight: 500;
+  font-size: 0.85rem; /* smaller label */
   color: #4a5568;
-  font-size: 0.95rem;
 }
 
-.form-group input {
-  padding: 0.75rem 1rem;
-  border: 1px solid #e2e8f0;
+/* Input / Select / Textarea */
+.form-group input,
+.form-group select,
+.form-group textarea {
+  padding: 0.5rem 0.75rem; /* smaller padding */
+  font-size: 0.88rem; /* smaller input text */
+  border: 1px solid #cbd5e0;
   border-radius: 6px;
-  font-size: 1rem;
-  transition: all 0.3s ease;
+  background: #ffffff;
+  transition: all 0.25s ease;
 }
 
-.form-group input:focus {
+.form-group input:focus,
+.form-group select:focus,
+.form-group textarea:focus {
   outline: none;
-  border-color: #4299e1;
-  box-shadow: 0 0 0 3px rgba(66, 153, 225, 0.2);
+  border-color: #3182ce;
+  box-shadow: 0 0 0 3px rgba(66, 153, 225, 0.15);
 }
 
+/* Textarea slightly smaller */
+.form-group textarea {
+  resize: vertical;
+  min-height: 50px;
+  font-size: 0.85rem;
+}
+
+/* Submit Button */
 .form-submit-btn {
-  background-color: #4299e1;
+  background-color: #3182ce;
   color: white;
-  padding: 0.75rem;
+  padding: 0.6rem 0; /* slightly smaller */
   border: none;
   border-radius: 6px;
-  font-size: 1rem;
+  font-size: 0.9rem; /* smaller */
   font-weight: 600;
   cursor: pointer;
-  transition: background-color 0.3s ease;
-  margin-top: 0.5rem;
+  transition: all 0.3s ease;
+  width: 35%;
+  align-self: flex-end;
 }
 
 .form-submit-btn:hover {
-  background-color: #3182ce;
+  background-color: #2b6cb0;
 }
 
-/* Responsive adjustments */
-@media (max-width: 640px) {
+/* Responsive Design */
+@media (max-width: 768px) {
+  .form-row {
+    grid-template-columns: 1fr;
+  }
+
   .add-item-container {
-    margin: 1rem;
-    padding: 1.5rem;
+    margin-left: 1rem;
+    padding: 1rem 1rem;
   }
 
-  .add-item-container h2 {
-    font-size: 1.5rem;
+  .form-submit-btn {
+    width: 100%;
+    align-self: center;
   }
 }
 
-/* Validation styling */
-.form-group input:invalid:not(:placeholder-shown) {
+/* Validation */
+.form-group input:invalid:not(:placeholder-shown),
+.form-group select:invalid {
   border-color: #fc8181;
 }
 

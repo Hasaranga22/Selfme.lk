@@ -88,32 +88,26 @@ const ProductRequestForm = () => {
             <div id="product-request-error" className="message error-message">
               <span className="icon">⚠️</span>
               {error}
-              <button
-                className="close-btn"
-                onClick={() => setError(null)}
-              >
+              <button className="close-btn" onClick={() => setError(null)}>
                 ×
               </button>
             </div>
           )}
 
           {success && (
-            <div id="product-request-success" className="message success-message">
+            <div
+              id="product-request-success"
+              className="message success-message"
+            >
               <span className="icon">✅</span>
               Product request submitted successfully!
-              <button
-                className="close-btn"
-                onClick={() => setSuccess(false)}
-              >
+              <button className="close-btn" onClick={() => setSuccess(false)}>
                 ×
               </button>
             </div>
           )}
 
-          <form
-            id="product-request-form"
-            onSubmit={handleSubmit}
-          >
+          <form id="product-request-form" onSubmit={handleSubmit}>
             <div id="product-request-form-grid">
               <div className="form-group">
                 <label htmlFor="supplier_name">Supplier Name *</label>
@@ -126,6 +120,40 @@ const ProductRequestForm = () => {
                   placeholder="Enter supplier name"
                   required
                 />
+              </div>
+
+              <div className="form-group">
+                <label htmlFor="product_category">Product Category *</label>
+                <select
+                  id="product_category"
+                  name="product_category"
+                  value={formData.product_category || ""}
+                  onChange={handleChange}
+                  required
+                >
+                  <option value="" disabled>
+                    Select category
+                  </option>
+                  <option value="Solar Panels">Solar Panels</option>
+                  <option value="Solar Batteries">Solar Batteries</option>
+                  <option value="Solar Inverters">Solar Inverters</option>
+                  <option value="Solar Controllers">Solar Controllers</option>
+                  <option value="Solar Wires & Cables">
+                    Solar Wires & Cables
+                  </option>
+                  <option value="Mounting Structures & Accessories">
+                    Mounting Structures & Accessories
+                  </option>
+                  <option value="Solar Lights & Devices">
+                    Solar Lights & Devices
+                  </option>
+                  <option value="Solar Pumps & Appliances">
+                    Solar Pumps & Appliances
+                  </option>
+                  <option value="Monitoring & Miscellaneous Accessories">
+                    Monitoring & Miscellaneous Accessories
+                  </option>
+                </select>
               </div>
 
               <div className="form-group">

@@ -1,0 +1,115 @@
+/* Order_Place.css */
+.orders-dashboard {
+  max-width: 1200px;
+  margin-left: 300px;
+  padding: 30px 20px;
+  background: #f5f6fa;
+  min-height: 100vh;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.orders-header {
+  margin-bottom: 30px;
+}
+
+.orders-header h2 {
+  font-size: 28px;
+  color: #1e293b;
+  margin-bottom: 5px;
+}
+
+.orders-header p {
+  color: #475569;
+  font-size: 16px;
+}
+
+/* Orders Grid */
+.orders-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 20px;
+}
+
+/* Order Card */
+.order-card {
+  display: flex;
+  flex-direction: column;
+  background: #fff;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.order-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 6px 18px rgba(0,0,0,0.12);
+}
+
+.order-image {
+  height: 140px;
+  background: #f0f0f0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  overflow: hidden;
+}
+
+.order-image img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.image-placeholder {
+  font-size: 24px;
+  color: #718093;
+  font-weight: 700;
+}
+
+/* Order Info */
+.order-info {
+  padding: 15px 12px;
+}
+
+.order-info h3 {
+  font-size: 18px;
+  color: #1e293b;
+  margin-bottom: 8px;
+}
+
+.order-info p {
+  font-size: 14px;
+  color: #475569;
+  margin-bottom: 5px;
+}
+
+.status {
+  font-weight: 600;
+  padding: 2px 8px;
+  border-radius: 6px;
+  text-transform: capitalize;
+}
+
+.status.pending {
+  background-color: #facc15;
+  color: #1f2937;
+}
+
+.status.completed {
+  background-color: #22c55e;
+  color: #fff;
+}
+
+.status.cancelled {
+  background-color: #ef4444;
+  color: #fff;
+}
+
+/* No orders */
+.no-orders {
+  text-align: center;
+  padding: 50px 0;
+  font-size: 18px;
+  color: #718093;
+}

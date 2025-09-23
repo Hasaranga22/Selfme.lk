@@ -32,7 +32,7 @@ const Add_Items = () => {
     "Monitoring & Miscellaneous Accessories",
   ];
 
-  const statusOptions = ["Available", "Damaged", "Returned", "Sold Out"];
+  const statusOptions = ["Available", "Coming Soon"];
 
   // Update form fields
   const handleChange = (e) => {
