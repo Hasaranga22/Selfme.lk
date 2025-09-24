@@ -198,7 +198,7 @@ const ProductRequestForm = () => {
               <div className="form-group">
                 <label htmlFor="unit_price">Unit Price (Rs) *</label>
                 <div className="input-with-symbol">
-                  <span className="currency-symbol">Rs</span>
+                  <span className="currency-symbol"></span>
                   <input
                     type="number"
                     id="unit_price"

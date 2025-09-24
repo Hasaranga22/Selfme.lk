@@ -20,17 +20,17 @@ function Stock_Outs() {
     fetchRecentOrders();
   }, []);
 
-  async function fetchItems() {
+  const fetchItems = async () => {
     try {
       const res = await axios.get(`${API}/products`);
       setItems(res.data || []);
     } catch (err) {
-      console.error("fetchItems error:", err);
+      console.error(err);
       setMessage("Failed to fetch items.");
     }
-  }
+  };
 
-  async function fetchRecentOrders() {
+  const fetchRecentOrders = async () => {
     try {
       const res = await axios.get(`${API}/stockouts`);
       setRecentOrders(
@@ -41,9 +41,9 @@ function Stock_Outs() {
         )
       );
     } catch (err) {
-      console.error("fetchRecentOrders err:", err);
+      console.error(err);
     }
-  }
+  };
 
   const addItemToOrder = (itemId) => {
     const item = items.find((it) => it._id === itemId);
@@ -52,10 +52,12 @@ function Stock_Outs() {
     setOrderItems((prev) => {
       const exist = prev.find((p) => p.product_id === item._id);
       if (exist) {
+        if (exist.quantity >= item.quantity_in_stock) {
+          setMessage(`Cannot add more. Only ${item.quantity_in_stock} available.`);
+          return prev;
+        }
         return prev.map((p) =>
-          p.product_id === item._id
-            ? { ...p, quantity: p.quantity + 1 }
-            : p
+          p.product_id === item._id ? { ...p, quantity: p.quantity + 1 } : p
         );
       }
       return [
@@ -65,25 +67,32 @@ function Stock_Outs() {
           item_name: item.item_name,
           price: Number(item.selling_price) || 0,
           quantity: 1,
+          available_stock: item.quantity_in_stock,
         },
       ];
     });
 
     setSelectedItemId("");
+    setMessage("");
   };
 
   const updateQuantity = (productId, qty) => {
     const n = Number(qty);
     if (isNaN(n) || n < 1) return;
+    const item = orderItems.find((i) => i.product_id === productId);
+    if (item && n > item.available_stock) {
+      setMessage(`Cannot exceed available stock of ${item.available_stock}`);
+      return;
+    }
     setOrderItems((prev) =>
-      prev.map((i) =>
-        i.product_id === productId ? { ...i, quantity: n } : i
-      )
+      prev.map((i) => (i.product_id === productId ? { ...i, quantity: n } : i))
     );
+    setMessage("");
   };
 
   const removeFromOrder = (productId) => {
     setOrderItems((prev) => prev.filter((i) => i.product_id !== productId));
+    setMessage("");
   };
 
   const total = orderItems.reduce(
@@ -91,61 +100,62 @@ function Stock_Outs() {
     0
   );
 
+  // ✅ Place and Confirm Order
   const placeAndConfirmOrder = async () => {
-    if (!type) {
-      setMessage("Please select an order type first.");
-      return;
-    }
-    if (type === "customer" && !customerId.trim()) {
-      setMessage("Please enter Customer ID.");
-      return;
-    }
-    if (orderItems.length === 0) {
-      setMessage("Please add at least one item to the order.");
-      return;
-    }
+    if (!type) return setMessage("Please select an order type first.");
+    if (type === "customer" && !customerId.trim())
+      return setMessage("Please enter Customer ID.");
+    if (orderItems.length === 0) return setMessage("Please add at least one item.");
 
     setLoading(true);
     try {
       const payloadItems = orderItems.map((i) => ({
         product_id: i.product_id,
+        item_name: i.item_name,
         quantity: i.quantity,
         price: i.price,
-        item_name: i.item_name,
       }));
 
-      const res = await axios.post(`${API}/stockouts`, {
-        customer_id: type === "customer" ? customerId : null,
+      const orderPayload = {
+        customer_id: type === "customer" ? customerId : "Technical Team",
+        type: type, // must match backend enum ["customer", "technical"]
         items: payloadItems,
-        type,
-      });
+        total: total,
+      };
 
-      const created = res.data;
-      await axios.put(`${API}/stockouts/${created._id}/confirm`);
-      
-      setMessage("Order successfully placed and confirmed! Stock has been updated.");
+      const res = await axios.post(`${API}/stockouts`, orderPayload);
+      const createdOrder = res.data;
+
+      // Confirm order immediately
+      await axios.put(`${API}/stockouts/${createdOrder._id}/confirm`);
+
+      setMessage("Order successfully placed and confirmed!");
       setOrderItems([]);
       setCustomerId("");
       setType("");
+      setSelectedItemId("");
       fetchItems();
       fetchRecentOrders();
     } catch (err) {
-      console.error("placeAndConfirmOrder err:", err);
-      setMessage("Failed to place order. Please try again.");
+      console.error(err.response?.data || err.message);
+      setMessage(
+        err.response?.data?.message || "Failed to place order. Try again."
+      );
     } finally {
       setLoading(false);
     }
   };
 
+  // Confirm Existing Order
   const confirmExistingOrder = async (orderId) => {
     try {
       await axios.put(`${API}/stockouts/${orderId}/confirm`);
-      setMessage("Order confirmed successfully! Stock has been updated.");
+      setMessage("Order confirmed successfully!");
       fetchItems();
       fetchRecentOrders();
     } catch (err) {
-      console.error("confirmExistingOrder err:", err);
-      setMessage("Failed to confirm order. Please try again.");
+      console.error(err);
+      setMessage("Failed to confirm order. Try again.");
     }
   };
 
@@ -158,129 +168,104 @@ function Stock_Outs() {
   };
 
   return (
-    <div className="stockouts-page" id="stockouts-main-page">
+    <div className="stockouts-page">
       <InventoryManagementNav />
 
-      <div className="stockouts-container" id="stockouts-main-container">
-        <div className="page-header" id="stockouts-page-header">
-          <h1 className="page-title" id="stockouts-main-title">Stock Out Management</h1>
-          <p className="page-subtitle" id="stockouts-subtitle">Create and process stock out orders for customers and technical team</p>
+      <div className="stockouts-container">
+        <div className="page-header">
+          <h1>Stock Out & Order Management</h1>
+          <p>Create and process stock out orders</p>
         </div>
 
-        {message && (
-          <div className={`message-alert ${message.includes('success') || message.includes('confirmed') ? 'success' : 'error'}`} id="stockouts-message-alert">
-            {message}
-          </div>
-        )}
+        {message && <div className="message-alert">{message}</div>}
 
-        <div className="main-content" id="stockouts-main-content">
-          <div className="order-creation-card" id="order-creation-section">
-            <div className="card-header" id="order-creation-header">
-              <h2 id="create-order-title">Create New Stock Out Order</h2>
-            </div>
+        <div className="main-content">
+          {/* Form + Order Items */}
+          <div className="order-creation-card">
+            <div className="order-card-content">
+              <div className="form-section">
+                <h3>Create New Order</h3>
 
-            <div className="form-section" id="order-type-section">
-              <div className="form-group" id="order-type-group">
-                <label htmlFor="order-type-select" id="order-type-label">Order Type</label>
-                <select
-                  id="order-type-select"
-                  className="form-select"
-                  value={type}
-                  onChange={(e) => setType(e.target.value)}
-                >
+                <label>Order Type *</label>
+                <select value={type} onChange={(e) => setType(e.target.value)}>
                   <option value="">Select Order Type</option>
                   <option value="customer">Customer Order</option>
                   <option value="technical">Technical Team Order</option>
                 </select>
+
+                {type === "customer" && (
+                  <>
+                    <label>Customer ID *</label>
+                    <input
+                      type="text"
+                      placeholder="Enter Customer ID"
+                      value={customerId}
+                      onChange={(e) => setCustomerId(e.target.value)}
+                    />
+                  </>
+                )}
+
+                {type && (
+                  <>
+                    <label>Add Item</label>
+                    <select
+                      value={selectedItemId}
+                      onChange={(e) => {
+                        if (e.target.value) addItemToOrder(e.target.value);
+                      }}
+                    >
+                      <option value="">Select Item</option>
+                      {items
+                        .filter((item) => item.quantity_in_stock > 0)
+                        .map((item) => (
+                          <option key={item._id} value={item._id}>
+                            {item.item_name} - LKR {item.selling_price} (Stock:{" "}
+                            {item.quantity_in_stock})
+                          </option>
+                        ))}
+                    </select>
+                  </>
+                )}
               </div>
 
-              {type === "customer" && (
-                <div className="form-group" id="customer-id-group">
-                  <label htmlFor="customer-id-input" id="customer-id-label">Customer ID</label>
-                  <input
-                    id="customer-id-input"
-                    className="form-input"
-                    placeholder="Enter Customer ID"
-                    value={customerId}
-                    onChange={(e) => setCustomerId(e.target.value)}
-                  />
-                </div>
-              )}
-            </div>
+              {orderItems.length > 0 && (
+                <div className="order-items-section">
+                  <h3>
+                    Order Items ({orderItems.length}){" "}
+                    <button className="clear-order-btn" onClick={clearOrder}>
+                      Clear
+                    </button>
+                  </h3>
 
-            {type && (
-              <div className="form-section" id="item-selection-section">
-                <div className="form-group" id="item-select-group">
-                  <label htmlFor="item-select" id="item-select-label">Add Items to Order</label>
-                  <select
-                    id="item-select"
-                    className="form-select item-select"
-                    value={selectedItemId}
-                    onChange={(e) => {
-                      const val = e.target.value;
-                      if (val) addItemToOrder(val);
-                    }}
-                  >
-                    <option value="">Select item to add to order</option>
-                    {items.map((item) => (
-                      <option key={item._id} value={item._id} id={`item-option-${item._id}`}>
-                        {item.item_name} — LKR {item.selling_price} — Stock: {item.quantity_in_stock}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-              </div>
-            )}
-
-            {orderItems.length > 0 && (
-              <div className="order-items-section" id="order-items-section">
-                <div className="section-header" id="order-items-header">
-                  <h3 id="order-items-title">Order Items</h3>
-                  <button 
-                    className="clear-order-btn" 
-                    id="clear-order-button"
-                    onClick={clearOrder}
-                  >
-                    Clear All
-                  </button>
-                </div>
-
-                <div className="order-table-container" id="order-table-container">
-                  <table className="order-table" id="order-items-table">
-                    <thead id="order-table-head">
+                  <table className="order-table">
+                    <thead>
                       <tr>
-                        <th>Item Name</th>
-                        <th>Quantity</th>
-                        <th>Unit Price (LKR)</th>
-                        <th>Subtotal (LKR)</th>
+                        <th>Item</th>
+                        <th>Qty</th>
+                        <th>Unit Price</th>
+                        <th>Subtotal</th>
                         <th>Action</th>
                       </tr>
                     </thead>
-                    <tbody id="order-table-body">
+                    <tbody>
                       {orderItems.map((item) => (
-                        <tr key={item.product_id} id={`order-row-${item.product_id}`}>
-                          <td className="item-name-cell" id={`item-name-${item.product_id}`}>
-                            {item.item_name}
-                          </td>
-                          <td className="quantity-cell" id={`quantity-cell-${item.product_id}`}>
+                        <tr key={item.product_id}>
+                          <td>{item.item_name}</td>
+                          <td>
                             <input
-                              id={`quantity-input-${item.product_id}`}
-                              className="quantity-input"
                               type="number"
                               min="1"
+                              max={item.available_stock}
                               value={item.quantity}
-                              onChange={(e) => updateQuantity(item.product_id, e.target.value)}
+                              onChange={(e) =>
+                                updateQuantity(item.product_id, e.target.value)
+                              }
                             />
                           </td>
-                          <td className="price-cell" id={`price-cell-${item.product_id}`}>
-                            {Number(item.price).toLocaleString()}
-                          </td>
-                          <td className="subtotal-cell" id={`subtotal-cell-${item.product_id}`}>
-                            {(item.price * item.quantity).toLocaleString("en-LK")}
-                          </td>
-                          <td className="action-cell" id={`action-cell-${item.product_id}`}>
+                          <td>LKR {item.price.toLocaleString()}</td>
+                          <td>LKR {(item.price * item.quantity).toLocaleString()}</td>
+                          <td>
                             <button
-                              id={`remove-btn-${item.product_id}`}
                               className="remove-item-btn"
                               onClick={() => removeFromOrder(item.product_id)}
                             >
@@ -292,19 +277,11 @@ function Stock_Outs() {
                     </tbody>
                   </table>
 
-                  <div className="order-total-section" id="order-total-section">
-                    <div className="total-row" id="order-total-row">
-                      <span className="total-label" id="total-label">Order Total:</span>
-                      <span className="total-amount" id="total-amount">
-                        LKR {total.toLocaleString("en-LK")}
-                      </span>
-                    </div>
+                  <div className="order-total">
+                    <strong>Total:</strong> LKR {total.toLocaleString()}
                   </div>
-                </div>
 
-                <div className="order-actions" id="order-actions-section">
                   <button
-                    id="place-confirm-order-btn"
                     className="place-order-btn"
                     onClick={placeAndConfirmOrder}
                     disabled={loading}
@@ -312,92 +289,56 @@ function Stock_Outs() {
                     {loading ? "Processing..." : "Place & Confirm Order"}
                   </button>
                 </div>
-              </div>
-            )}
+              )}
+            </div>
           </div>
 
-          <div className="orders-history-card" id="orders-history-section">
-            <div className="card-header" id="orders-history-header">
-              <h2 id="orders-history-title">Recent Orders</h2>
-            </div>
-
+          {/* Recent Orders */}
+          <div className="orders-history-card">
+            <h3>Recent Orders</h3>
             {recentOrders.length === 0 ? (
-              <div className="empty-state" id="empty-orders-state">
-                <p>No orders have been placed yet.</p>
-              </div>
+              <p>No orders yet.</p>
             ) : (
-              <div className="history-table-container" id="history-table-container">
-                <table className="history-table" id="orders-history-table">
-                  <thead id="history-table-head">
-                    <tr>
-                      <th>Order ID</th>
-                      <th>Type</th>
-                      <th>Customer/Team</th>
-                      <th>Items</th>
-                      <th>Total</th>
-                      <th>Date</th>
-                      <th>Status</th>
-                      <th>Action</th>
-                    </tr>
-                  </thead>
-                  <tbody id="history-table-body">
-                    {recentOrders.map((order) => {
-                      const orderDate = new Date(order.createdAt || order.orderDate);
-                      return (
-                        <tr key={order._id} id={`history-row-${order._id}`}>
-                          <td className="order-id-cell" id={`order-id-${order._id}`}>
-                            {order._id.slice(-8).toUpperCase()}
-                          </td>
-                          <td className="order-type-cell" id={`order-type-${order._id}`}>
-                            {order.type === 'technical' ? 'Technical Team' : 'Customer'}
-                          </td>
-                          <td className="customer-cell" id={`customer-${order._id}`}>
-                            {order.type === "technical" ? "Technical Team" : order.customer_id || "-"}
-                          </td>
-                          <td className="items-cell" id={`items-${order._id}`}>
-                            <div className="items-list">
-                              {(order.items || []).map((item, idx) => (
-                                <div key={idx} className="item-detail" id={`item-detail-${order._id}-${idx}`}>
-                                  {item.item_name} × {item.quantity}
-                                </div>
-                              ))}
-                            </div>
-                          </td>
-                          <td className="total-cell" id={`total-${order._id}`}>
-                            LKR {Number(order.total || 0).toLocaleString()}
-                          </td>
-                          <td className="date-cell" id={`date-${order._id}`}>
-                            <div className="date-info">
-                              <div>{orderDate.toLocaleDateString()}</div>
-                              <div className="time">{orderDate.toLocaleTimeString()}</div>
-                            </div>
-                          </td>
-                          <td className="status-cell" id={`status-${order._id}`}>
-                            <span className={`status-badge status-${order.status.toLowerCase()}`}>
-                              {order.status}
-                            </span>
-                          </td>
-                          <td className="action-cell" id={`action-${order._id}`}>
-                            {order.status !== "Confirmed" ? (
-                              <button
-                                id={`confirm-btn-${order._id}`}
-                                className="confirm-order-btn"
-                                onClick={() => confirmExistingOrder(order._id)}
-                              >
-                                Confirm
-                              </button>
-                            ) : (
-                              <span className="confirmed-status" id={`confirmed-${order._id}`}>
-                                Confirmed
-                              </span>
-                            )}
-                          </td>
-                        </tr>
-                      );
-                    })}
-                  </tbody>
-                </table>
-              </div>
+              <table className="history-table">
+                <thead>
+                  <tr>
+                    <th>ID</th>
+                    <th>Type</th>
+                    <th>Customer/Team</th>
+                    <th>Total</th>
+                    <th>Date</th>
+                    <th>Status</th>
+                    <th>Action</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {recentOrders.slice(0, 5).map((order) => {
+                    const orderDate = new Date(order.createdAt || order.orderDate);
+                    return (
+                      <tr key={order._id}>
+                        <td>{order._id.slice(-8).toUpperCase()}</td>
+                        <td>{order.type === "technical" ? "Technical Team" : "Customer"}</td>
+                        <td>{order.customer_id}</td>
+                        <td>LKR {Number(order.total || 0).toLocaleString()}</td>
+                        <td>{orderDate.toLocaleDateString()}</td>
+                        <td>{order.status || "Pending"}</td>
+                        <td>
+                          {order.status !== "Confirmed" ? (
+                            <button
+                              className="confirm-btn"
+                              onClick={() => confirmExistingOrder(order._id)}
+                            >
+                              Confirm
+                            </button>
+                          ) : (
+                            <span>Confirmed</span>
+                          )}
+                        </td>
+                      </tr>
+                    );
+                  })}
+                </tbody>
+              </table>
             )}
           </div>
         </div>

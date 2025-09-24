@@ -1,110 +1,78 @@
-// InventoryManagementNav.jsx
 import React, { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import "./Inventory_Management_Nav.css";
 
 const InventoryManagementNav = () => {
-  const [activeDropdown, setActiveDropdown] = useState(null);
+  const location = useLocation(); // for active link highlighting
 
-  const toggleDropdown = (index) => {
-    setActiveDropdown((prev) => (prev === index ? null : index));
-  };
+  // Categories always expanded
+  const [activeDropdown] = useState([0, 1, 2, 3]); 
+
+  const isActive = (path) => location.pathname === path;
 
   return (
     <aside className="inv-nav">
+      {/* Brand Section */}
       <div className="inv-nav__brand">
         <Link to="/inventory" className="inv-nav__brand-link">
           Selfme.lk
         </Link>
+        <span className="inv-nav__subtitle">Inventory Management</span>
       </div>
 
+      {/* Navigation */}
       <nav className="inv-nav__menu" aria-label="Inventory Navigation">
         <ul className="inv-nav__list">
-          {/* Inventory */}
+
+          {/* Product Management */}
           <li className="inv-nav__item">
-            <button
-              className={`inv-nav__header ${
-                activeDropdown === 0 ? "is-active" : ""
-              }`}
-              onClick={() => toggleDropdown(0)}
-              aria-expanded={activeDropdown === 0}
-            >
-              <span>Inventory</span>
-              <span className="inv-nav__arrow">▾</span>
+            <button className="inv-nav__header">
+              <span>Product Management</span>
             </button>
-            <div
-              className={`inv-nav__submenu ${
-                activeDropdown === 0 ? "is-open" : ""
-              }`}
-            >
-              <Link to="/addItems" className="inv-nav__link">
+            <div className="inv-nav__submenu">
+              <Link
+                to="/addItems"
+                className={`inv-nav__link ${isActive("/addItems") ? "active" : ""}`}
+              >
                 Add Items
               </Link>
-              <Link to="/viewAllItems" className="inv-nav__link">
+              <Link
+                to="/viewAllItems"
+                className={`inv-nav__link ${isActive("/viewAllItems") ? "active" : ""}`}
+              >
                 View / Update / Delete Items
               </Link>
-              <Link to="/stocklevels" className="inv-nav__link">
+              <Link
+                to="/stocklevels"
+                className={`inv-nav__link ${isActive("/stocklevels") ? "active" : ""}`}
+              >
                 Stock Levels
               </Link>
-              <Link to="/reorderlevels" className="inv-nav__link">
-                Reorder Alerts
-              </Link>
-              <Link to="/damage_return_add" className="inv-nav__link">
-                Mark Damaged Item
-              </Link>
-            </div>
-          </li>
-
-          {/* Inventory Tracking */}
-          <li className="inv-nav__item">
-            <button
-              className={`inv-nav__header ${
-                activeDropdown === 1 ? "is-active" : ""
-              }`}
-              onClick={() => toggleDropdown(1)}
-              aria-expanded={activeDropdown === 1}
-            >
-              <span>Inventory Tracking</span>
-              <span className="inv-nav__arrow">▾</span>
-            </button>
-            <div
-              className={`inv-nav__submenu ${
-                activeDropdown === 1 ? "is-open" : ""
-              }`}
-            >
-              <Link to="/order_placing" className="inv-nav__link">
-                Place Order
-              </Link>
-              <Link to="/material_outgoings" className="inv-nav__link">
-                Material Outgoings
-              </Link>
-              <Link to="/material_outgoings_history" className="inv-nav__link">
-                Material Outgoings History
+              <Link
+                to="/damage_return_add"
+                className={`inv-nav__link ${isActive("/damage_return_add") ? "active" : ""}`}
+              >
+                Mark Damaged / Return Items
               </Link>
             </div>
           </li>
 
-          {/* Order Requests */}
+          {/* Re-Order Handle */}
           <li className="inv-nav__item">
-            <button
-              className={`inv-nav__header ${
-                activeDropdown === 2 ? "is-active" : ""
-              }`}
-              onClick={() => toggleDropdown(2)}
-              aria-expanded={activeDropdown === 2}
-            >
-              <span>Order Requests</span>
-              <span className="inv-nav__arrow">▾</span>
+            <button className="inv-nav__header">
+              <span>Re-Order Handle</span>
             </button>
-            <div
-              className={`inv-nav__submenu ${
-                activeDropdown === 2 ? "is-open" : ""
-              }`}
-            >
-              <Link to="/product_request" className="inv-nav__link">
-                Product Request
+            <div className="inv-nav__submenu">
+              <Link
+                to="/reorderlevels"
+                className={`inv-nav__link ${isActive("/reorderlevels") ? "active" : ""}`}
+              >
+                Re-Order Handle
               </Link>
-              <Link to="/product_status" className="inv-nav__link">
+              <Link
+                to="/product_status"
+                className={`inv-nav__link ${isActive("/product_status") ? "active" : ""}`}
+              >
                 Approve / Reject Requests
               </Link>
             </div>
@@ -112,60 +80,59 @@ const InventoryManagementNav = () => {
 
           {/* Supplier */}
           <li className="inv-nav__item">
-            <button
-              className={`inv-nav__header ${
-                activeDropdown === 3 ? "is-active" : ""
-              }`}
-              onClick={() => toggleDropdown(3)}
-              aria-expanded={activeDropdown === 3}
-            >
-              <span>Suppliers</span>
-              <span className="inv-nav__arrow">▾</span>
+            <button className="inv-nav__header">
+              <span>Supplier</span>
             </button>
-            <div
-              className={`inv-nav__submenu ${
-                activeDropdown === 3 ? "is-open" : ""
-              }`}
-            >
-              <Link to="/addSupplier" className="inv-nav__link">
+            <div className="inv-nav__submenu">
+              <Link
+                to="/addSupplier"
+                className={`inv-nav__link ${isActive("/addSupplier") ? "active" : ""}`}
+              >
                 Add Supplier
               </Link>
-              <Link to="/viewSuppliers" className="inv-nav__link">
-                View / Update / Delete Suppliers
+              <Link
+                to="/viewSuppliers"
+                className={`inv-nav__link ${isActive("/viewSuppliers") ? "active" : ""}`}
+              >
+                Manage Supplier
               </Link>
             </div>
           </li>
 
           {/* Reports */}
           <li className="inv-nav__item">
-            <button
-              className={`inv-nav__header ${
-                activeDropdown === 4 ? "is-active" : ""
-              }`}
-              onClick={() => toggleDropdown(4)}
-              aria-expanded={activeDropdown === 4}
-            >
+            <button className="inv-nav__header">
               <span>Reports</span>
-              <span className="inv-nav__arrow">▾</span>
             </button>
-            <div
-              className={`inv-nav__submenu ${
-                activeDropdown === 4 ? "is-open" : ""
-              }`}
-            >
-              <Link to="/reports/stock" className="inv-nav__link">
+            <div className="inv-nav__submenu">
+              <Link
+                to="/reports/stock"
+                className={`inv-nav__link ${isActive("/reports/stock") ? "active" : ""}`}
+              >
                 Stock Summary
               </Link>
-              <Link to="/reports/supplier" className="inv-nav__link">
+              <Link
+                to="/reports/supplier"
+                className={`inv-nav__link ${isActive("/reports/supplier") ? "active" : ""}`}
+              >
                 Supplier Report
               </Link>
-              <Link to="/reports/request" className="inv-nav__link">
+              <Link
+                to="/reports/request"
+                className={`inv-nav__link ${isActive("/reports/request") ? "active" : ""}`}
+              >
                 Request Fulfillment
               </Link>
-              <Link to="/reports/damage" className="inv-nav__link">
+              <Link
+                to="/reports/damage"
+                className={`inv-nav__link ${isActive("/reports/damage") ? "active" : ""}`}
+              >
                 Damaged Items Report
               </Link>
-              <Link to="/reports/valuation" className="inv-nav__link">
+              <Link
+                to="/reports/valuation"
+                className={`inv-nav__link ${isActive("/reports/valuation") ? "active" : ""}`}
+              >
                 Inventory Valuation
               </Link>
             </div>
@@ -173,6 +140,7 @@ const InventoryManagementNav = () => {
         </ul>
       </nav>
 
+      {/* Footer */}
       <div className="inv-nav__footer">
         <button className="inv-nav__signout">Sign Out</button>
       </div>
