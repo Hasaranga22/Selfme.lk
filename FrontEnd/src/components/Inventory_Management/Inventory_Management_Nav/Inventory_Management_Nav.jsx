@@ -78,6 +78,9 @@ const InventoryManagementNav = () => {
               <Link to="/material_outgoings" className="inv-nav__link">
                 Material Outgoings
               </Link>
+              <Link to="/material_outgoings_history" className="inv-nav__link">
+                Material Outgoings History
+              </Link>
             </div>
           </li>
 

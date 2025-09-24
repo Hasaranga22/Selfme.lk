@@ -14,7 +14,8 @@ import Inevntory_Damaged_Return from "./components/Inventory_Management/Inevntor
 import Add_Suppliers from "./components/Inventory_Management/Supplier/Supplier";
 import View_Suppliers from "./components/Inventory_Management/View_Suppliers/View_Suppliers";
 import Order_Place from "./components/Inventory_Management/Order_Place/Order_Place";
-
+import Stock_Outs from "./components/Inventory_Management/Stock_Outs/Stock_Outs";
+import Stock_Outs_History from "./components/Inventory_Management/Stock_Out_History/Stock_Out_History";
 function App() {
   return (
     <div>
@@ -38,18 +39,22 @@ function App() {
           element={<Inevntory_Damaged_Return />}
         />
 
-<Route
-          path="/order_placing"
-          element={<Order_Place />}
-        />
-        {/* <Route
+        <Route path="/order_placing" element={<Order_Place />} />
+         <Route
           path="/material_outgoings"
-          element={<Inevntory_Damaged_Return />}
-        /> */}
+          element={<Stock_Outs />}
+        />
+        <Route
+          path="/material_outgoings_history"
+          element={<Stock_Outs_History />}
+        /> 
+
+
 
         <Route path="/addSupplier" element={<Add_Suppliers />} />
         <Route path="/viewSuppliers" element={<View_Suppliers />} />
       </Routes>
+      
     </div>
   );
 }

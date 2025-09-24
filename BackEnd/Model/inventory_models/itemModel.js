@@ -16,7 +16,7 @@ const productSchema = new mongoose.Schema(
       required: true,
     },
     item_image: {
-      type: String, 
+      type: String,
     },
     description: {
       type: String,
@@ -30,7 +30,7 @@ const productSchema = new mongoose.Schema(
       required: true,
     },
     supplier_id: {
-      type: Number, 
+      type: Number,
     },
     purchase_price: {
       type: Number,
@@ -45,12 +45,12 @@ const productSchema = new mongoose.Schema(
       default: "Available",
     },
     product_remark: {
-      type: String, 
+      type: String,
     },
   },
   {
-    timestamps: true, 
+    timestamps: true,
   }
 );
 
-module.exports = mongoose.model("Product", productSchema);
+module.exports = mongoose.models.Product || mongoose.model("Product", productSchema);

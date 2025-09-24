@@ -5,6 +5,7 @@ const itemRoutes = require("./Routes/item_routes/ItemRoutes");
 const productRequestRoutes = require("./Routes/item_routes/productRequestRoutes");
 const supplierRouter = require("./Routes/item_routes/supplierRoutes");
 const orderRoutes = require("./Routes/item_routes/orderRoutes");
+const stockOutRoutes  = require ("./Routes/item_routes/stockOutRoutes")
 const cors = require("cors");
 const path = require("path");
 
@@ -22,6 +23,8 @@ app.use("/products", itemRoutes);
 app.use("/orders", orderRoutes);
 app.use("/productRequests", productRequestRoutes);
 app.use("/suppliers", supplierRouter);
+app.use("/stockouts", stockOutRoutes);
+
 
 // Error handling middleware
 app.use((error, req, res, next) => {
