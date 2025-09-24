@@ -156,7 +156,6 @@ function Product_Request_Status() {
 
         {error && (
           <div className="error-message">
-            <span className="error-icon">⚠️</span>
             {error}
             <button className="error-close" onClick={() => setError(null)}>
               ×
@@ -166,14 +165,12 @@ function Product_Request_Status() {
 
         <div className="summary-section">
           <div className="summary-card">
-            <div className="summary-icon total">📋</div>
             <div className="summary-content">
               <h3>Total Requests</h3>
               <div className="stat-number">{requests.length}</div>
             </div>
           </div>
           <div className="summary-card">
-            <div className="summary-icon pending">⏳</div>
             <div className="summary-content">
               <h3>Pending Value</h3>
               <div className="stat-number">
@@ -186,7 +183,6 @@ function Product_Request_Status() {
             </div>
           </div>
           <div className="summary-card">
-            <div className="summary-icon approved">✅</div>
             <div className="summary-content">
               <h3>Approved Value</h3>
               <div className="stat-number">
@@ -199,7 +195,6 @@ function Product_Request_Status() {
             </div>
           </div>
           <div className="summary-card">
-            <div className="summary-icon completed">🎯</div>
             <div className="summary-content">
               <h3>Completed Value</h3>
               <div className="stat-number">
@@ -222,7 +217,6 @@ function Product_Request_Status() {
               onChange={(e) => setSearchTerm(e.target.value)}
               className="search-input"
             />
-            <span className="search-icon">🔍</span>
           </div>
           <select
             value={filterStatus}
@@ -240,7 +234,6 @@ function Product_Request_Status() {
         <div className="table-container">
           {filteredRequests.length === 0 ? (
             <div className="no-data">
-              <div className="no-data-icon">📭</div>
               <p>No requests found matching your criteria.</p>
             </div>
           ) : (
@@ -292,14 +285,12 @@ function Product_Request_Status() {
                         <button
                           className="btn btn-edit"
                           onClick={() => handleUpdateClick(req)}
-                          title="Edit request"
                         >
                           Edit
                         </button>
                         <button
                           className="btn btn-delete"
                           onClick={() => handleDelete(req._id)}
-                          title="Delete request"
                         >
                           Delete
                         </button>
@@ -320,7 +311,6 @@ function Product_Request_Status() {
                 <button
                   className="modal-close"
                   onClick={() => setShowUpdateModal(false)}
-                  title="Close modal"
                 >
                   ×
                 </button>

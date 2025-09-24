@@ -38,7 +38,9 @@ const View_Suppliers = () => {
     setSelectedSupplier({
       ...supplier,
       newImage: null,
-      imagePreview: supplier.image ? `http://localhost:5000/uploads/${supplier.image}` : null
+      imagePreview: supplier.image
+        ? `http://localhost:5000/uploads/${supplier.image}`
+        : null,
     });
     setIsEditModalOpen(true);
     setUpdateError(null);
@@ -48,9 +50,9 @@ const View_Suppliers = () => {
   // Handle input change in edit form
   const handleInputChange = (e) => {
     const { name, value } = e.target;
-    setSelectedSupplier(prev => ({
+    setSelectedSupplier((prev) => ({
       ...prev,
-      [name]: value
+      [name]: value,
     }));
   };
 
@@ -58,10 +60,10 @@ const View_Suppliers = () => {
   const handleImageChange = (e) => {
     const file = e.target.files[0];
     if (file) {
-      setSelectedSupplier(prev => ({
+      setSelectedSupplier((prev) => ({
         ...prev,
         newImage: file,
-        imagePreview: URL.createObjectURL(file)
+        imagePreview: URL.createObjectURL(file),
       }));
     }
   };
@@ -75,9 +77,13 @@ const View_Suppliers = () => {
 
     try {
       const formData = new FormData();
-      Object.keys(selectedSupplier).forEach(key => {
-        if (key !== 'image' && key !== 'imagePreview' && selectedSupplier[key] !== undefined) {
-          formData.append(key, selectedSupplier[key] || '');
+      Object.keys(selectedSupplier).forEach((key) => {
+        if (
+          key !== "image" &&
+          key !== "imagePreview" &&
+          selectedSupplier[key] !== undefined
+        ) {
+          formData.append(key, selectedSupplier[key] || "");
         }
       });
 
@@ -85,9 +91,13 @@ const View_Suppliers = () => {
         formData.append("image", selectedSupplier.newImage);
       }
 
-      await axios.put(`http://localhost:5000/suppliers/${selectedSupplier._id}`, formData, {
-        headers: { "Content-Type": "multipart/form-data" },
-      });
+      await axios.put(
+        `http://localhost:5000/suppliers/${selectedSupplier._id}`,
+        formData,
+        {
+          headers: { "Content-Type": "multipart/form-data" },
+        }
+      );
 
       setUpdateSuccess(true);
       setIsEditModalOpen(false);
@@ -103,7 +113,9 @@ const View_Suppliers = () => {
   // Delete supplier
   const handleDelete = async () => {
     try {
-      await axios.delete(`http://localhost:5000/suppliers/${supplierToDelete._id}`);
+      await axios.delete(
+        `http://localhost:5000/suppliers/${supplierToDelete._id}`
+      );
       setSuppliers(suppliers.filter((s) => s._id !== supplierToDelete._id));
       setIsDeleteModalOpen(false);
       setSupplierToDelete(null);
@@ -119,70 +131,146 @@ const View_Suppliers = () => {
   };
 
   return (
-    <div className="suppliers-page">
+    <div id="suppliers-page">
       <InventoryManagementNav />
 
-      <div className="suppliers-content">
+      <div id="suppliers-content" className="suppliers-content">
         {/* Header */}
-        <div className="page-header">
+        <div id="suppliers-header" className="page-header">
           <div className="header-info">
             <h1>Supplier Management</h1>
-            <p>Manage all supplier information</p>
+            <p>Manage all supplier information and details</p>
           </div>
           <div className="header-actions">
-            <button onClick={() => window.location.href = '/supplier'}>Add New Supplier</button>
+            <button
+              className="btn-primary"
+              onClick={() => (window.location.href = "/supplier")}
+            >
+              Add New Supplier
+            </button>
           </div>
         </div>
 
         {/* Stats */}
-        <div className="stats-container">
+        <div id="suppliers-stats" className="stats-container">
           <div className="stat-item">
             <h3>{suppliers.length}</h3>
             <p>Total Suppliers</p>
           </div>
           <div className="stat-item">
-            <h3>{suppliers.filter(s => s.status === 'Active').length}</h3>
+            <h3>{suppliers.filter((s) => s.status === "Active").length}</h3>
             <p>Active Suppliers</p>
           </div>
           <div className="stat-item">
-            <h3>{suppliers.filter(s => s.status === 'Inactive').length}</h3>
+            <h3>{suppliers.filter((s) => s.status === "Inactive").length}</h3>
             <p>Inactive Suppliers</p>
           </div>
         </div>
 
-        {error && <div className="alert alert-error">{error}</div>}
-        {updateSuccess && <div className="alert alert-success">Supplier updated successfully!</div>}
+        {error && (
+          <div id="suppliers-error" className="alert alert-error">
+            {error}
+          </div>
+        )}
+        {updateSuccess && (
+          <div id="suppliers-success" className="alert alert-success">
+            Supplier updated successfully!
+          </div>
+        )}
 
         {/* Supplier Cards */}
-        <div className="suppliers-container">
+        <div id="suppliers-container" className="suppliers-container">
           {loading ? (
-            <p>Loading...</p>
+            <div id="suppliers-loading" className="loading-state">
+              <div className="spinner"></div>
+              <p>Loading suppliers...</p>
+            </div>
           ) : suppliers.length === 0 ? (
-            <p>No suppliers found.</p>
+            <div id="suppliers-empty" className="empty-state">
+              <p>No suppliers found.</p>
+              <button
+                className="btn-primary"
+                onClick={() => (window.location.href = "/supplier")}
+              >
+                Add Your First Supplier
+              </button>
+            </div>
           ) : (
-            <div className="suppliers-grid">
+            <div id="suppliers-grid" className="suppliers-grid">
               {suppliers.map((supplier) => (
                 <div key={supplier._id} className="supplier-card">
-                  <div className="card-image">
-                    {supplier.image ? <img src={`http://localhost:5000/uploads/${supplier.image}`} alt={supplier.name} /> :
-                    <div className="image-placeholder">No Image</div>}
+                  <div className="supplier-header">
+                    <div className="supplier-image-container">
+                      {supplier.image ? (
+                        <img
+                          src={`http://localhost:5000/uploads/${supplier.image}`}
+                          alt={supplier.name}
+                          className="supplier-image"
+                        />
+                      ) : (
+                        <div className="supplier-image-placeholder">
+                          {supplier.name?.charAt(0).toUpperCase() || "S"}
+                        </div>
+                      )}
+                    </div>
+                    <div className="supplier-title">
+                      <h3 className="supplier-name">{supplier.name}</h3>
+                      <span
+                        className={`status-badge status-${
+                          supplier.status?.toLowerCase() || "active"
+                        }`}
+                      >
+                        {supplier.status || "Active"}
+                      </span>
+                    </div>
                   </div>
-                  <div className="card-content">
-                    <div className="supplier-header">
-                      <h3>{supplier.name}</h3>
-                      <span className={`status ${supplier.status?.toLowerCase() || 'active'}`}>{supplier.status || 'Active'}</span>
+
+                  <div className="supplier-info">
+                    <div className="info-item">
+                      <span className="info-label">Company:</span>
+                      <span className="info-value">
+                        {supplier.company_name || "Not specified"}
+                      </span>
                     </div>
-                    <div className="supplier-info">
-                      <p>Company: {supplier.company_name || 'N/A'}</p>
-                      <p>Email: {supplier.email || 'N/A'}</p>
-                      <p>Phone: {supplier.phone || 'N/A'}</p>
-                      <p>Address: {supplier.address || 'N/A'}</p>
-                      {supplier.remark && <p>Remark: {supplier.remark}</p>}
+                    <div className="info-item">
+                      <span className="info-label">Email:</span>
+                      <span className="info-value">
+                        {supplier.email || "Not provided"}
+                      </span>
                     </div>
-                    <div className="card-actions">
-                      <button onClick={() => openEditModal(supplier)}>Edit</button>
-                      <button onClick={() => openDeleteModal(supplier)}>Delete</button>
+                    <div className="info-item">
+                      <span className="info-label">Phone:</span>
+                      <span className="info-value">
+                        {supplier.phone || "Not provided"}
+                      </span>
                     </div>
+                    <div className="info-item">
+                      <span className="info-label">Address:</span>
+                      <span className="info-value">
+                        {supplier.address || "Not provided"}
+                      </span>
+                    </div>
+                    {supplier.remark && (
+                      <div className="info-item">
+                        <span className="info-label">Remark:</span>
+                        <span className="info-value">{supplier.remark}</span>
+                      </div>
+                    )}
+                  </div>
+
+                  <div className="supplier-actions">
+                    <button
+                      className="btn-edit"
+                      onClick={() => openEditModal(supplier)}
+                    >
+                      Edit
+                    </button>
+                    <button
+                      className="btn-delete"
+                      onClick={() => openDeleteModal(supplier)}
+                    >
+                      Delete
+                    </button>
                   </div>
                 </div>
               ))}
@@ -193,31 +281,140 @@ const View_Suppliers = () => {
 
       {/* Edit Modal */}
       {isEditModalOpen && selectedSupplier && (
-        <div className="modal-overlay">
+        <div id="edit-modal-overlay" className="modal-overlay">
           <div className="modal">
-            <h2>Edit Supplier</h2>
-            <form onSubmit={handleUpdate}>
-              <input type="text" name="name" value={selectedSupplier.name} onChange={handleInputChange} placeholder="Supplier Name" required />
-              <input type="text" name="company_name" value={selectedSupplier.company_name || ''} onChange={handleInputChange} placeholder="Company Name" />
-              <input type="email" name="email" value={selectedSupplier.email || ''} onChange={handleInputChange} placeholder="Email" />
-              <input type="tel" name="phone" value={selectedSupplier.phone || ''} onChange={handleInputChange} placeholder="Phone" />
-              
-              {/* Status select */}
-              <select name="status" value={selectedSupplier.status || 'Active'} onChange={handleInputChange}>
-                <option value="Active">Active</option>
-                <option value="Inactive">Inactive</option>
-              </select>
-              
-              <textarea name="address" value={selectedSupplier.address || ''} onChange={handleInputChange} placeholder="Address" rows="3" />
-              <textarea name="remark" value={selectedSupplier.remark || ''} onChange={handleInputChange} placeholder="Remark" rows="2" />
+            <div className="modal-header">
+              <h2>Edit Supplier</h2>
+              <button
+                className="modal-close"
+                onClick={() => setIsEditModalOpen(false)}
+              >
+                ×
+              </button>
+            </div>
 
-              <input type="file" onChange={handleImageChange} />
-              {selectedSupplier.imagePreview && <img src={selectedSupplier.imagePreview} alt="Preview" className="preview-img" />}
+            <form onSubmit={handleUpdate} className="modal-form">
+              <div className="form-grid">
+                <div className="form-group">
+                  <label htmlFor="edit-name">Supplier Name *</label>
+                  <input
+                    type="text"
+                    id="edit-name"
+                    name="name"
+                    value={selectedSupplier.name}
+                    onChange={handleInputChange}
+                    placeholder="Supplier Name"
+                    required
+                  />
+                </div>
 
-              {updateError && <p className="form-error">{updateError}</p>}
+                <div className="form-group">
+                  <label htmlFor="edit-company">Company Name</label>
+                  <input
+                    type="text"
+                    id="edit-company"
+                    name="company_name"
+                    value={selectedSupplier.company_name || ""}
+                    onChange={handleInputChange}
+                    placeholder="Company Name"
+                  />
+                </div>
 
-              <button type="submit">{updateLoading ? "Updating..." : "Update Supplier"}</button>
-              <button type="button" onClick={() => setIsEditModalOpen(false)}>Cancel</button>
+                <div className="form-group">
+                  <label htmlFor="edit-email">Email</label>
+                  <input
+                    type="email"
+                    id="edit-email"
+                    name="email"
+                    value={selectedSupplier.email || ""}
+                    onChange={handleInputChange}
+                    placeholder="Email"
+                  />
+                </div>
+
+                <div className="form-group">
+                  <label htmlFor="edit-phone">Phone</label>
+                  <input
+                    type="tel"
+                    id="edit-phone"
+                    name="phone"
+                    value={selectedSupplier.phone || ""}
+                    onChange={handleInputChange}
+                    placeholder="Phone"
+                  />
+                </div>
+
+                <div className="form-group">
+                  <label htmlFor="edit-status">Status</label>
+                  <select
+                    id="edit-status"
+                    name="status"
+                    value={selectedSupplier.status || "Active"}
+                    onChange={handleInputChange}
+                  >
+                    <option value="Active">Active</option>
+                    <option value="Inactive">Inactive</option>
+                  </select>
+                </div>
+
+                <div className="form-group full-width">
+                  <label htmlFor="edit-address">Address</label>
+                  <textarea
+                    id="edit-address"
+                    name="address"
+                    value={selectedSupplier.address || ""}
+                    onChange={handleInputChange}
+                    placeholder="Address"
+                    rows="3"
+                  />
+                </div>
+
+                <div className="form-group full-width">
+                  <label htmlFor="edit-remark">Remark</label>
+                  <textarea
+                    id="edit-remark"
+                    name="remark"
+                    value={selectedSupplier.remark || ""}
+                    onChange={handleInputChange}
+                    placeholder="Remark"
+                    rows="2"
+                  />
+                </div>
+
+                <div className="form-group full-width">
+                  <label htmlFor="edit-image">Supplier Image</label>
+                  <input
+                    type="file"
+                    id="edit-image"
+                    onChange={handleImageChange}
+                    accept="image/*"
+                  />
+                  {selectedSupplier.imagePreview && (
+                    <div className="image-preview">
+                      <img src={selectedSupplier.imagePreview} alt="Preview" />
+                    </div>
+                  )}
+                </div>
+              </div>
+
+              {updateError && <div className="form-error">{updateError}</div>}
+
+              <div className="modal-actions">
+                <button
+                  type="button"
+                  className="btn-secondary"
+                  onClick={() => setIsEditModalOpen(false)}
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  className="btn-primary"
+                  disabled={updateLoading}
+                >
+                  {updateLoading ? "Updating..." : "Update Supplier"}
+                </button>
+              </div>
             </form>
           </div>
         </div>
@@ -225,12 +422,37 @@ const View_Suppliers = () => {
 
       {/* Delete Modal */}
       {isDeleteModalOpen && supplierToDelete && (
-        <div className="modal-overlay">
+        <div id="delete-modal-overlay" className="modal-overlay">
           <div className="modal">
-            <h2>Confirm Delete</h2>
-            <p>Are you sure you want to delete <strong>{supplierToDelete.name}</strong>?</p>
-            <button onClick={handleDelete}>Delete</button>
-            <button onClick={() => setIsDeleteModalOpen(false)}>Cancel</button>
+            <div className="modal-header">
+              <h2>Confirm Delete</h2>
+              <button
+                className="modal-close"
+                onClick={() => setIsDeleteModalOpen(false)}
+              >
+                ×
+              </button>
+            </div>
+
+            <div className="modal-content">
+              <p>
+                Are you sure you want to delete{" "}
+                <strong>{supplierToDelete.name}</strong>?
+              </p>
+              <p className="warning-text">This action cannot be undone.</p>
+            </div>
+
+            <div className="modal-actions">
+              <button
+                className="btn-secondary"
+                onClick={() => setIsDeleteModalOpen(false)}
+              >
+                Cancel
+              </button>
+              <button className="btn-danger" onClick={handleDelete}>
+                Delete Supplier
+              </button>
+            </div>
           </div>
         </div>
       )}
