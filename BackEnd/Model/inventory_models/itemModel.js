@@ -29,8 +29,10 @@ const productSchema = new mongoose.Schema(
       type: Number,
       required: true,
     },
-    supplier_id: {
-      type: Number,
+    supplier_name: {
+      // changed from supplier_details/supplier_id
+      type: String,
+      required: true,
     },
     purchase_price: {
       type: Number,
@@ -53,4 +55,5 @@ const productSchema = new mongoose.Schema(
   }
 );
 
-module.exports = mongoose.models.Product || mongoose.model("Product", productSchema);
+module.exports =
+  mongoose.models.Product || mongoose.model("Product", productSchema);

@@ -7,6 +7,7 @@ import "./View_All_Items.css";
 const View_All_Items = () => {
   const [items, setItems] = useState([]);
   const [filteredItems, setFilteredItems] = useState([]);
+  const [suppliers, setSuppliers] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [searchTerm, setSearchTerm] = useState("");
@@ -46,13 +47,26 @@ const View_All_Items = () => {
 
   const statusOptions = ["Available", "Damaged", "Returned", "Sold Out"];
 
-  // Fetch items with filters
+  // Fetch suppliers
+  useEffect(() => {
+    const fetchSuppliers = async () => {
+      try {
+        const res = await axios.get("http://localhost:5000/suppliers");
+        setSuppliers(res.data);
+      } catch (err) {
+        console.error("Error fetching suppliers:", err);
+      }
+    };
+    fetchSuppliers();
+  }, []);
+
+  // Fetch items
   const fetchItems = async () => {
     try {
       setLoading(true);
       const params = new URLSearchParams();
-
-      if (filters.category !== "all") params.append("category", filters.category);
+      if (filters.category !== "all")
+        params.append("category", filters.category);
       if (filters.status !== "all") params.append("status", filters.status);
       if (filters.sortBy) params.append("sortBy", filters.sortBy);
       if (filters.sortOrder) params.append("sortOrder", filters.sortOrder);
@@ -71,58 +85,46 @@ const View_All_Items = () => {
 
   useEffect(() => {
     fetchItems();
-  }, [filters.category, filters.status, filters.sortBy, filters.sortOrder, filters.lowStock]);
+  }, [
+    filters.category,
+    filters.status,
+    filters.sortBy,
+    filters.sortOrder,
+    filters.lowStock,
+  ]);
 
-  // Handle search
+  // Search
   useEffect(() => {
     const results = items.filter((item) =>
-      Object.values(item).some((value) =>
-        value && value.toString().toLowerCase().includes(searchTerm.toLowerCase())
+      Object.values(item).some(
+        (value) =>
+          value &&
+          value.toString().toLowerCase().includes(searchTerm.toLowerCase())
       )
     );
     setFilteredItems(results);
   }, [searchTerm, items]);
 
-  // Handle filter changes
   const handleFilterChange = (filterType, value) => {
-    setFilters((prev) => ({
-      ...prev,
-      [filterType]: value,
-    }));
+    setFilters((prev) => ({ ...prev, [filterType]: value }));
   };
 
-  // Handle sort changes
   const handleSortChange = (sortBy, sortOrder) => {
-    setFilters((prev) => ({
-      ...prev,
-      sortBy,
-      sortOrder,
-    }));
+    setFilters((prev) => ({ ...prev, sortBy, sortOrder }));
   };
 
-  // Open delete confirmation modal
   const openDeleteModal = (item) => {
-    setDeleteModal({
-      isOpen: true,
-      item: item,
-      loading: false,
-    });
+    setDeleteModal({ isOpen: true, item, loading: false });
   };
 
-  // Close delete modal
   const closeDeleteModal = () => {
-    setDeleteModal({
-      isOpen: false,
-      item: null,
-      loading: false,
-    });
+    setDeleteModal({ isOpen: false, item: null, loading: false });
   };
 
-  // Open edit modal
   const openEditModal = (item) => {
     setEditModal({
       isOpen: true,
-      item: item,
+      item,
       loading: false,
       formData: {
         serial_number: item.serial_number,
@@ -131,18 +133,19 @@ const View_All_Items = () => {
         description: item.description || "",
         quantity_in_stock: item.quantity_in_stock,
         re_order_level: item.re_order_level,
-        supplier_id: item.supplier_id || "",
+        supplier_name: item.supplier_name || "",
         purchase_price: item.purchase_price,
         selling_price: item.selling_price,
         status: item.status,
         product_remark: item.product_remark || "",
       },
-      imagePreview: item.item_image ? `http://localhost:5000/images/${item.item_image}` : null,
+      imagePreview: item.item_image
+        ? `http://localhost:5000/images/${item.item_image}`
+        : null,
       newImage: null,
     });
   };
 
-  // Close edit modal
   const closeEditModal = () => {
     setEditModal({
       isOpen: false,
@@ -154,19 +157,14 @@ const View_All_Items = () => {
     });
   };
 
-  // Handle form input changes
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setEditModal((prev) => ({
       ...prev,
-      formData: {
-        ...prev.formData,
-        [name]: value,
-      },
+      formData: { ...prev.formData, [name]: value },
     }));
   };
 
-  // Handle image upload
   const handleImageChange = (e) => {
     const file = e.target.files[0];
     if (file) {
@@ -178,71 +176,51 @@ const View_All_Items = () => {
     }
   };
 
-  // Handle delete confirmation
   const handleDeleteConfirm = async () => {
     if (!deleteModal.item) return;
-
     try {
       setDeleteModal((prev) => ({ ...prev, loading: true }));
-
-      await axios.delete(`http://localhost:5000/products/${deleteModal.item._id}`);
-
-      setError(null);
+      await axios.delete(
+        `http://localhost:5000/products/${deleteModal.item._id}`
+      );
       alert(`"${deleteModal.item.item_name}" has been deleted successfully!`);
-
       fetchItems();
       closeDeleteModal();
     } catch (err) {
-      const errorMessage = err.response?.data?.message || "Failed to delete item";
-      setError(errorMessage);
-      console.error("Delete error:", err);
+      setError(err.response?.data?.message || "Failed to delete item");
       closeDeleteModal();
     }
   };
 
-  // Handle update confirmation
   const handleUpdateConfirm = async () => {
     if (!editModal.item) return;
-
     try {
       setEditModal((prev) => ({ ...prev, loading: true }));
 
       const formData = new FormData();
-      
-      // Append all form data
-      Object.keys(editModal.formData).forEach((key) => {
-        formData.append(key, editModal.formData[key]);
-      });
+      Object.keys(editModal.formData).forEach((key) =>
+        formData.append(key, editModal.formData[key])
+      );
 
-      // Append new image if selected
-      if (editModal.newImage) {
-        formData.append("item_image", editModal.newImage);
-      }
+      if (editModal.newImage) formData.append("item_image", editModal.newImage);
 
-      const response = await axios.put(
+      await axios.put(
         `http://localhost:5000/products/${editModal.item._id}`,
         formData,
         {
-          headers: {
-            "Content-Type": "multipart/form-data",
-          },
+          headers: { "Content-Type": "multipart/form-data" },
         }
       );
 
-      setError(null);
       alert(`"${editModal.item.item_name}" has been updated successfully!`);
-
       fetchItems();
       closeEditModal();
     } catch (err) {
-      const errorMessage = err.response?.data?.message || "Failed to update item";
-      setError(errorMessage);
-      console.error("Update error:", err);
+      setError(err.response?.data?.message || "Failed to update item");
       setEditModal((prev) => ({ ...prev, loading: false }));
     }
   };
 
-  // Calculate total value
   const totalValue = items.reduce(
     (sum, item) => sum + item.quantity_in_stock * item.selling_price,
     0
@@ -265,7 +243,10 @@ const View_All_Items = () => {
       <div className="view-items-container">
         <div className="page-header">
           <h2>Inventory Management</h2>
-          <button className="add-item-btn" onClick={() => navigate("/add-item")}>
+          <button
+            className="add-item-btn"
+            onClick={() => navigate("/add-item")}
+          >
             + Add New Item
           </button>
         </div>
@@ -283,12 +264,16 @@ const View_All_Items = () => {
           <div className="stat-card">
             <h3>Low Stock Items</h3>
             <p className="stat-number">
-              {items.filter((item) => item.quantity_in_stock <= item.re_order_level).length}
+              {
+                items.filter(
+                  (item) => item.quantity_in_stock <= item.re_order_level
+                ).length
+              }
             </p>
           </div>
         </div>
 
-        {/* Filters and Search */}
+        {/* Filters & Search */}
         <div className="filters-container">
           <div className="search-box">
             <input
@@ -328,7 +313,9 @@ const View_All_Items = () => {
 
             <select
               value={filters.sortBy}
-              onChange={(e) => handleSortChange(e.target.value, filters.sortOrder)}
+              onChange={(e) =>
+                handleSortChange(e.target.value, filters.sortOrder)
+              }
             >
               <option value="createdAt">Sort by Date</option>
               <option value="item_name">Sort by Name</option>
@@ -340,7 +327,9 @@ const View_All_Items = () => {
               <input
                 type="checkbox"
                 checked={filters.lowStock}
-                onChange={(e) => handleFilterChange("lowStock", e.target.checked)}
+                onChange={(e) =>
+                  handleFilterChange("lowStock", e.target.checked)
+                }
               />
               Show Low Stock Only
             </label>
@@ -376,10 +365,17 @@ const View_All_Items = () => {
                   <h3 className="item-name">{item.item_name}</h3>
                   <p className="item-serial">SN: {item.serial_number}</p>
                   <p className="item-category">{item.category}</p>
+                  <p className="item-supplier">
+                    Supplier: {item.supplier_name || "N/A"}
+                  </p>
 
                   <div className="item-stock-info">
-                    <span className="stock-quantity">{item.quantity_in_stock} in stock</span>
-                    <span className="reorder-level">Reorder at: {item.re_order_level}</span>
+                    <span className="stock-quantity">
+                      {item.quantity_in_stock} in stock
+                    </span>
+                    <span className="reorder-level">
+                      Reorder at: {item.re_order_level}
+                    </span>
                   </div>
 
                   <div className="item-pricing">
@@ -392,7 +388,9 @@ const View_All_Items = () => {
                   </div>
 
                   <div className="item-status">
-                    <span className={`status-badge status-${item.status.toLowerCase()}`}>
+                    <span
+                      className={`status-badge status-${item.status.toLowerCase()}`}
+                    >
                       {item.status}
                     </span>
                   </div>
@@ -403,10 +401,16 @@ const View_All_Items = () => {
                 </div>
 
                 <div className="item-actions">
-                  <button className="btn-update" onClick={() => openEditModal(item)}>
+                  <button
+                    className="btn-update"
+                    onClick={() => openEditModal(item)}
+                  >
                     Edit
                   </button>
-                  <button className="btn-delete" onClick={() => openDeleteModal(item)}>
+                  <button
+                    className="btn-delete"
+                    onClick={() => openDeleteModal(item)}
+                  >
                     Delete
                   </button>
                 </div>
@@ -416,7 +420,10 @@ const View_All_Items = () => {
             <div className="no-items-found">
               <p>No items found{searchTerm && ` matching "${searchTerm}"`}.</p>
               {searchTerm && (
-                <button className="btn-clear-search" onClick={() => setSearchTerm("")}>
+                <button
+                  className="btn-clear-search"
+                  onClick={() => setSearchTerm("")}
+                >
                   Clear Search
                 </button>
               )}
@@ -424,7 +431,7 @@ const View_All_Items = () => {
           )}
         </div>
 
-        {/* Delete Confirmation Modal */}
+        {/* Delete Modal */}
         {deleteModal.isOpen && (
           <div className="modal-overlay">
             <div className="modal-content">
@@ -445,12 +452,17 @@ const View_All_Items = () => {
                   <span>Category: {deleteModal.item?.category}</span>
                 </div>
                 <p className="warning-text">
-                  ⚠️ This action cannot be undone. All item data will be permanently deleted.
+                  ⚠️ This action cannot be undone. All item data will be
+                  permanently deleted.
                 </p>
               </div>
 
               <div className="modal-actions">
-                <button className="btn-cancel" onClick={closeDeleteModal} disabled={deleteModal.loading}>
+                <button
+                  className="btn-cancel"
+                  onClick={closeDeleteModal}
+                  disabled={deleteModal.loading}
+                >
                   Cancel
                 </button>
                 <button
@@ -465,7 +477,7 @@ const View_All_Items = () => {
           </div>
         )}
 
-        {/* Edit Item Modal */}
+        {/* Edit Modal */}
         {editModal.isOpen && (
           <div className="modal-overlay">
             <div className="modal-content edit-modal">
@@ -496,14 +508,16 @@ const View_All_Items = () => {
                       <button
                         type="button"
                         className="btn-upload"
-                        onClick={() => document.querySelector('.image-upload-input').click()}
+                        onClick={() =>
+                          document.querySelector(".image-upload-input").click()
+                        }
                       >
                         Change Image
                       </button>
                     </div>
                   </div>
 
-                  {/* Basic Information */}
+                  {/* Basic Info */}
                   <div className="form-row">
                     <div className="form-group">
                       <label>Serial Number *</label>
@@ -544,6 +558,7 @@ const View_All_Items = () => {
                         ))}
                       </select>
                     </div>
+
                     <div className="form-group">
                       <label>Status *</label>
                       <select
@@ -562,6 +577,28 @@ const View_All_Items = () => {
                   </div>
 
                   <div className="form-group">
+                    <label>Supplier *</label>
+                    <select
+                      name="supplier_name"
+                      value={editModal.formData.supplier_name || ""}
+                      onChange={handleInputChange}
+                      required
+                    >
+                      <option value="">Select Supplier</option>
+                      {suppliers
+                        .filter((supplier) => supplier.status === "Active") // Only active suppliers
+                        .map((supplier) => (
+                          <option key={supplier._id} value={supplier.name}>
+                            {supplier.name}{" "}
+                            {supplier.company_name
+                              ? `- ${supplier.company_name}`
+                              : ""}
+                          </option>
+                        ))}
+                    </select>
+                  </div>
+
+                  <div className="form-group">
                     <label>Description</label>
                     <textarea
                       name="description"
@@ -571,7 +608,7 @@ const View_All_Items = () => {
                     />
                   </div>
 
-                  {/* Inventory Information */}
+                  {/* Inventory Info */}
                   <div className="form-row">
                     <div className="form-group">
                       <label>Quantity in Stock *</label>
@@ -580,10 +617,10 @@ const View_All_Items = () => {
                         name="quantity_in_stock"
                         value={editModal.formData.quantity_in_stock}
                         onChange={handleInputChange}
-                        min="0"
                         required
                       />
                     </div>
+
                     <div className="form-group">
                       <label>Re-order Level *</label>
                       <input
@@ -591,67 +628,54 @@ const View_All_Items = () => {
                         name="re_order_level"
                         value={editModal.formData.re_order_level}
                         onChange={handleInputChange}
-                        min="0"
                         required
                       />
                     </div>
                   </div>
 
-                  <div className="form-group">
-                    <label>Supplier ID</label>
-                    <input
-                      type="number"
-                      name="supplier_id"
-                      value={editModal.formData.supplier_id}
-                      onChange={handleInputChange}
-                      min="1"
-                    />
-                  </div>
-
-                  {/* Pricing Information */}
+                  {/* Prices */}
                   <div className="form-row">
                     <div className="form-group">
-                      <label>Purchase Price (LKR) *</label>
+                      <label>Purchase Price *</label>
                       <input
                         type="number"
                         name="purchase_price"
                         value={editModal.formData.purchase_price}
                         onChange={handleInputChange}
-                        min="0"
-                        step="0.01"
                         required
                       />
                     </div>
+
                     <div className="form-group">
-                      <label>Selling Price (LKR) *</label>
+                      <label>Selling Price *</label>
                       <input
                         type="number"
                         name="selling_price"
                         value={editModal.formData.selling_price}
                         onChange={handleInputChange}
-                        min="0"
-                        step="0.01"
                         required
                       />
                     </div>
                   </div>
 
-                  {/* Remarks */}
                   <div className="form-group">
-                    <label>Remarks</label>
+                    <label>Product Remark</label>
                     <textarea
                       name="product_remark"
                       value={editModal.formData.product_remark}
                       onChange={handleInputChange}
-                      rows="3"
-                      placeholder="Additional notes or comments..."
+                      rows="2"
                     />
                   </div>
                 </div>
               </div>
 
               <div className="modal-actions">
-                <button className="btn-cancel" onClick={closeEditModal} disabled={editModal.loading}>
+                <button
+                  className="btn-cancel"
+                  onClick={closeEditModal}
+                  disabled={editModal.loading}
+                >
                   Cancel
                 </button>
                 <button
