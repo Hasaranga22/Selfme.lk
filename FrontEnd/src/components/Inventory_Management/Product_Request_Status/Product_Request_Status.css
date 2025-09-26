@@ -559,3 +559,18 @@
     min-width: 50px;
   }
 }
+/* Add Print Button Style */
+.btn-print {
+  background: #007bff;
+  color: white;
+  padding: 0.6rem 1.2rem;
+  font-size: 0.8rem;
+  border-radius: 4px;
+  cursor: pointer;
+  border: none;
+  transition: background 0.2s;
+}
+
+.btn-print:hover {
+  background: #0056b3;
+}

@@ -6,9 +6,6 @@ import logo from "./logo selfme.png"; // Corrected import path
 const InventoryManagementNav = () => {
   const location = useLocation(); // for active link highlighting
 
-  // Categories always expanded
-  const [activeDropdown] = useState([0, 1, 2, 3]);
-
   const isActive = (path) => location.pathname === path;
 
   return (
@@ -116,8 +113,33 @@ const InventoryManagementNav = () => {
             </div>
           </li>
 
-          {/* Reports */}
+          {/* Stock Out Management */}
           <li className="inv-nav__item">
+            <button className="inv-nav__header">
+              <span>Stock Out Management</span>
+            </button>
+            <div className="inv-nav__submenu">
+              <Link
+                to="/material_outgoings"
+                className={`inv-nav__link ${
+                  isActive("/material_outgoings") ? "active" : ""
+                }`}
+              >
+                Order Out & Confirm
+              </Link>
+              <Link
+                to="/material_outgoings_history"
+                className={`inv-nav__link ${
+                  isActive("/material_outgoings_history") ? "active" : ""
+                }`}
+              >
+                Order Placed History
+              </Link>
+            </div>
+          </li>
+
+          {/* Reports */}
+          {/* <li className="inv-nav__item">
             <button className="inv-nav__header">
               <span>Reports</span>
             </button>
@@ -163,7 +185,7 @@ const InventoryManagementNav = () => {
                 Inventory Valuation
               </Link>
             </div>
-          </li>
+          </li> */}
         </ul>
       </nav>
 

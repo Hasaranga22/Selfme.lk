@@ -42,11 +42,11 @@ function App() {
         <Route path="/order_placing" element={<Order_Place />} />
          <Route
           path="/material_outgoings"
-          element={<Stock_Outs />}
+          element={<Stock_Outs/>}
         />
         <Route
           path="/material_outgoings_history"
-          element={<Stock_Outs_History />}
+          element={<Stock_Outs_History/>}
         /> 
 
 

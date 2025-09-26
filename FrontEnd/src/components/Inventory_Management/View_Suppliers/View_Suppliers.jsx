@@ -1,6 +1,9 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import InventoryManagementNav from "../Inventory_Management_Nav/Inventory_Management_Nav";
+import { jsPDF } from "jspdf";
+import "jspdf-autotable";
+import logo from "./logo selfme.png"; // make sure this path is correct
 import "./View_Suppliers.css";
 
 const View_Suppliers = () => {
@@ -130,6 +133,114 @@ const View_Suppliers = () => {
     setIsDeleteModalOpen(true);
   };
 
+  // ------------------- PDF GENERATION FUNCTION -------------------
+  const handlePrintPDF = () => {
+    if (!suppliers.length) return alert("No suppliers to export.");
+
+    try {
+      const doc = new jsPDF("p", "mm", "a4");
+      const margin = 15;
+      const pageWidth = doc.internal.pageSize.getWidth();
+      const date = new Date();
+      const formattedDate = date.toLocaleDateString();
+      const formattedTime = date.toLocaleTimeString();
+
+      const img = new Image();
+      img.src = logo;
+      img.onload = () => {
+        doc.addImage(img, "PNG", margin, 8, 20, 20);
+
+        doc.setFontSize(16);
+        doc.setTextColor(33, 37, 41);
+        doc.text("SelfMe Pvt Ltd", margin + 25, 15);
+
+        doc.setFontSize(9);
+        doc.setTextColor(100, 100, 100);
+        doc.text(
+          "No/346, Madalanda, Dompe, Colombo, Sri Lanka",
+          margin + 25,
+          21
+        );
+        doc.text(
+          "Phone: +94 717 882 883 | Email: Selfmepvtltd@gmail.com",
+          margin + 25,
+          26
+        );
+
+        doc.setDrawColor(200, 200, 200);
+        doc.setLineWidth(0.5);
+        doc.line(margin, 32, pageWidth - margin, 32);
+
+        doc.setFontSize(14);
+        doc.setTextColor(0, 53, 128);
+        doc.text("SUPPLIER LIST REPORT", pageWidth / 2, 45, {
+          align: "center",
+        });
+
+        doc.setFontSize(10);
+        doc.setTextColor(80, 80, 80);
+        doc.text(
+          `Generated on: ${formattedDate} at ${formattedTime}`,
+          margin,
+          55
+        );
+        doc.text(`Total Suppliers: ${suppliers.length}`, margin, 62);
+
+        const tableColumns = [
+          { header: "#", dataKey: "index" },
+          { header: "Name", dataKey: "name" },
+          { header: "Company", dataKey: "company" },
+          { header: "Email", dataKey: "email" },
+          { header: "Phone", dataKey: "phone" },
+          { header: "Status", dataKey: "status" },
+        ];
+
+        const tableData = suppliers.map((s, i) => ({
+          index: i + 1,
+          name: s.name || "N/A",
+          company: s.company_name || "N/A",
+          email: s.email || "N/A",
+          phone: s.phone || "N/A",
+          status: s.status || "Active",
+        }));
+
+        doc.autoTable({
+          columns: tableColumns,
+          body: tableData,
+          startY: 75,
+          margin: { left: margin, right: margin },
+          theme: "grid",
+          headStyles: {
+            fillColor: [0, 53, 128],
+            textColor: 255,
+            fontStyle: "bold",
+            halign: "center",
+          },
+          columnStyles: {
+            index: { halign: "center", fontStyle: "bold" },
+            status: { halign: "center" },
+          },
+          didDrawPage: (data) => {
+            const pageCount = doc.internal.getNumberOfPages();
+            doc.setFontSize(8);
+            doc.setTextColor(150, 150, 150);
+            doc.text(
+              `SelfMe Inventory Management System - Page ${data.pageNumber} of ${pageCount}`,
+              pageWidth / 2,
+              doc.internal.pageSize.height - 10,
+              { align: "center" }
+            );
+          },
+        });
+
+        doc.save(`Supplier_List_${formattedDate.replace(/\//g, "-")}.pdf`);
+      };
+    } catch (err) {
+      console.error("PDF generation failed:", err);
+      alert("Error generating PDF.");
+    }
+  };
+
   return (
     <div id="suppliers-page">
       <InventoryManagementNav />
@@ -177,6 +288,15 @@ const View_Suppliers = () => {
             Supplier updated successfully!
           </div>
         )}
+
+        {/* PDF Button */}
+        <button
+          className="btn-secondary"
+          style={{ marginLeft: "10px", marginBottom: "1.5rem" }}
+          onClick={handlePrintPDF}
+        >
+          Generate PDF
+        </button>
 
         {/* Supplier Cards */}
         <div id="suppliers-container" className="suppliers-container">

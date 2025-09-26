@@ -1,8 +1,25 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
-import { useNavigate } from "react-router-dom";
-import "./Inevntory_Damaged_Return.css";
+import { jsPDF } from "jspdf";
+import "jspdf-autotable";
 import InventoryManagementNav from "../Inventory_Management_Nav/Inventory_Management_Nav";
+import logo from "./logo selfme.png";
+import "./Inevntory_Damaged_Return.css";
+
+const categories = [
+  "All Categories",
+  "Solar Panels",
+  "Solar Batteries",
+  "Solar Inverters",
+  "Solar Controllers",
+  "Solar Wires & Cables",
+  "Mounting Structures & Accessories",
+  "Solar Lights & Devices",
+  "Solar Pumps & Appliances",
+  "Monitoring & Miscellaneous Accessories",
+];
+
+const statusOptions = ["Damaged", "Returned"];
 
 const Inevntory_Damaged_Return = () => {
   const [items, setItems] = useState([]);
@@ -10,130 +27,250 @@ const Inevntory_Damaged_Return = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [searchTerm, setSearchTerm] = useState("");
-  const [filters, setFilters] = useState({
-    category: "all",
-    status: "all",
-    sortBy: "createdAt",
-    sortOrder: "desc",
-  });
-  const [statusModal, setStatusModal] = useState({
-    isOpen: false,
-    item: null,
-    loading: false,
-    newStatus: "",
-    remark: "",
-  });
-
-  const navigate = useNavigate();
-
-  const categories = [
-    "Solar Panels",
-    "Solar Batteries",
-    "Solar Inverters",
-    "Solar Controllers",
-    "Solar Wires & Cables",
-    "Mounting Structures & Accessories",
-    "Solar Lights & Devices",
-    "Solar Pumps & Appliances",
-    "Monitoring & Miscellaneous Accessories",
-  ];
-
-  const statusOptions = ["Damaged", "Returned", "Available"];
-
-  const fetchItems = async () => {
-    try {
-      setLoading(true);
-      const params = new URLSearchParams();
-      if (filters.category !== "all") params.append("category", filters.category);
-      if (filters.status !== "all") params.append("status", filters.status);
-      if (filters.sortBy) params.append("sortBy", filters.sortBy);
-      if (filters.sortOrder) params.append("sortOrder", filters.sortOrder);
-
-      const res = await axios.get(`http://localhost:5000/products?${params}`);
-      const damagedReturnedItems = res.data.filter(
-        (item) => item.status === "Damaged" || item.status === "Returned"
-      );
-      setItems(damagedReturnedItems);
-      setFilteredItems(damagedReturnedItems);
-    } catch (error) {
-      setError("Failed to fetch damaged/returned items. Please try again.");
-    } finally {
-      setLoading(false);
-    }
-  };
+  const [filterCategory, setFilterCategory] = useState("All Categories");
+  const [filterStatus, setFilterStatus] = useState("all");
+  const [selectedItems, setSelectedItems] = useState(new Set());
+  const [pdfLoading, setPdfLoading] = useState(false);
 
   useEffect(() => {
+    const fetchItems = async () => {
+      try {
+        setLoading(true);
+        const res = await axios.get("http://localhost:5000/products");
+        const damagedReturnedItems = res.data.filter(
+          (item) => item.status === "Damaged" || item.status === "Returned"
+        );
+        setItems(damagedReturnedItems);
+        setFilteredItems(damagedReturnedItems);
+      } catch (err) {
+        setError("Failed to fetch items. Try again.");
+      } finally {
+        setLoading(false);
+      }
+    };
     fetchItems();
-  }, [filters.category, filters.status, filters.sortBy, filters.sortOrder]);
+  }, []);
 
   useEffect(() => {
-    const results = items.filter((item) =>
+    let results = items.filter((item) =>
       Object.values(item).some(
-        (value) => value && value.toString().toLowerCase().includes(searchTerm.toLowerCase())
+        (v) =>
+          v && v.toString().toLowerCase().includes(searchTerm.toLowerCase())
       )
     );
+
+    if (filterCategory !== "All Categories") {
+      results = results.filter((item) => item.category === filterCategory);
+    }
+
+    if (filterStatus !== "all") {
+      results = results.filter((item) => item.status === filterStatus);
+    }
+
     setFilteredItems(results);
-  }, [searchTerm, items]);
+    setSelectedItems(new Set());
+  }, [searchTerm, filterCategory, filterStatus, items]);
 
-  const handleFilterChange = (filterType, value) => {
-    setFilters((prev) => ({ ...prev, [filterType]: value }));
+  const toggleItemSelection = (itemId) => {
+    const newSelected = new Set(selectedItems);
+    if (newSelected.has(itemId)) newSelected.delete(itemId);
+    else newSelected.add(itemId);
+    setSelectedItems(newSelected);
   };
 
-  const handleSortChange = (sortBy, sortOrder) => {
-    setFilters((prev) => ({ ...prev, sortBy, sortOrder }));
+  const selectAllItems = () => {
+    if (selectedItems.size === filteredItems.length)
+      setSelectedItems(new Set());
+    else setSelectedItems(new Set(filteredItems.map((i) => i._id)));
   };
 
-  const openStatusModal = (item) =>
-    setStatusModal({
-      isOpen: true,
-      item,
-      loading: false,
-      newStatus: item.status,
-      remark: item.product_remark || "",
-    });
-
-  const closeStatusModal = () =>
-    setStatusModal({ isOpen: false, item: null, loading: false, newStatus: "", remark: "" });
-
-  const handleStatusChange = (e) => {
-    setStatusModal((prev) => ({ ...prev, newStatus: e.target.value }));
+  const stats = {
+    totalItems: items.length,
+    damagedItems: items.filter((i) => i.status === "Damaged").length,
+    returnedItems: items.filter((i) => i.status === "Returned").length,
+    totalCapital: items.reduce(
+      (sum, i) => sum + (i.purchase_price || 0) * (i.quantity_in_stock || 0),
+      0
+    ),
   };
 
-  const handleRemarkChange = (e) => {
-    setStatusModal((prev) => ({ ...prev, remark: e.target.value }));
-  };
-
-  const handleStatusUpdate = async () => {
-    if (!statusModal.item) return;
+  const generatePDF = (itemsToExport, reportType = "all") => {
+    setPdfLoading(true);
     try {
-      setStatusModal((prev) => ({ ...prev, loading: true }));
-      const updateData = {
-        status: statusModal.newStatus,
-        product_remark: statusModal.remark,
-      };
-      await axios.put(`http://localhost:5000/products/${statusModal.item._id}`, updateData);
-      fetchItems();
-      closeStatusModal();
+      const doc = new jsPDF("p", "mm", "a4");
+      const pageWidth = doc.internal.pageSize.getWidth();
+      const margin = 15;
+      const date = new Date();
+      const formattedDate = date.toLocaleDateString();
+      const formattedTime = date.toLocaleTimeString();
+
+      // Header
+      doc.addImage(logo, "PNG", margin, 8, 20, 20);
+      doc.setFontSize(16);
+      doc.setTextColor(33, 37, 41);
+      doc.text("SelfMe Pvt Ltd", margin + 25, 15);
+      doc.setFontSize(9);
+      doc.setTextColor(100, 100, 100);
+      doc.text("No/346, Madalanda, Dompe, Colombo, Sri Lanka", margin + 25, 21);
+      doc.text(
+        "Phone: +94 717 882 883 | Email: Selfmepvtltd@gmail.com",
+        margin + 25,
+        26
+      );
+      doc.setDrawColor(200, 200, 200);
+      doc.setLineWidth(0.5);
+      doc.line(margin, 32, pageWidth - margin, 32);
+
+      // Report title
+      doc.setFontSize(14);
+      doc.setTextColor(0, 53, 128);
+      const title =
+        reportType === "selected"
+          ? "SELECTED DAMAGED/RETURNED ITEMS REPORT"
+          : "DAMAGED & RETURNED INVENTORY REPORT";
+      doc.text(title, pageWidth / 2, 45, { align: "center" });
+
+      // Report details
+      doc.setFontSize(10);
+      doc.setTextColor(80, 80, 80);
+      doc.text(
+        `Generated on: ${formattedDate} at ${formattedTime}`,
+        margin,
+        55
+      );
+      doc.text(`Total Items: ${itemsToExport.length}`, margin, 62);
+      const reportTotalCapital = itemsToExport.reduce(
+        (sum, i) => sum + (i.purchase_price || 0) * (i.quantity_in_stock || 0),
+        0
+      );
+      doc.text(
+        `Total Capital Value: Rs. ${reportTotalCapital.toLocaleString("en-US", {
+          minimumFractionDigits: 2,
+          maximumFractionDigits: 2,
+        })}`,
+        margin,
+        69
+      );
+
+      // Table
+      const tableColumns = [
+        { header: "#", dataKey: "index" },
+        { header: "Serial Number", dataKey: "serial" },
+        { header: "Item Name", dataKey: "name" },
+        { header: "Category", dataKey: "category" },
+        { header: "Status", dataKey: "status" },
+        { header: "Quantity", dataKey: "stock" },
+        { header: "Unit Price (Rs.)", dataKey: "unitPrice" },
+        { header: "Total Value (Rs.)", dataKey: "totalValue" },
+        { header: "Remark", dataKey: "remark" },
+      ];
+
+      const tableData = itemsToExport.map((item, index) => {
+        const unitPrice = item.purchase_price || 0;
+        const totalValue = unitPrice * (item.quantity_in_stock || 0);
+        return {
+          index: index + 1,
+          serial: item.serial_number,
+          name:
+            item.item_name.length > 25
+              ? item.item_name.slice(0, 25) + "..."
+              : item.item_name,
+          category:
+            item.category.length > 20
+              ? item.category.slice(0, 20) + "..."
+              : item.category,
+          status: item.status,
+          stock: item.quantity_in_stock,
+          unitPrice: unitPrice.toLocaleString("en-US", {
+            minimumFractionDigits: 2,
+            maximumFractionDigits: 2,
+          }),
+          totalValue: totalValue.toLocaleString("en-US", {
+            minimumFractionDigits: 2,
+            maximumFractionDigits: 2,
+          }),
+          remark: item.product_remark || "-",
+        };
+      });
+
+      doc.autoTable({
+        columns: tableColumns,
+        body: tableData,
+        startY: 75,
+        margin: { left: margin, right: margin },
+        theme: "grid",
+        styles: { fontSize: 7, cellPadding: 2 },
+        headStyles: {
+          fillColor: [0, 53, 128],
+          textColor: 255,
+          fontStyle: "bold",
+          halign: "center",
+        },
+        columnStyles: {
+          unitPrice: { halign: "right" },
+          totalValue: { halign: "right" },
+        },
+        didDrawPage: (data) => {
+          const pageCount = doc.internal.getNumberOfPages();
+          const currentPage = data.pageNumber;
+          doc.setFontSize(8);
+          doc.setTextColor(150, 150, 150);
+          doc.text(
+            `SelfMe Inventory Management System - Page ${currentPage} of ${pageCount}`,
+            pageWidth / 2,
+            doc.internal.pageSize.height - 10,
+            { align: "center" }
+          );
+        },
+      });
+
+      const finalY = doc.lastAutoTable.finalY + 15;
+      if (finalY < doc.internal.pageSize.height - 30) {
+        doc.setFontSize(10);
+        doc.setTextColor(80, 80, 80);
+        doc.text("Authorized Signature:", margin, finalY);
+        doc.line(margin + 50, finalY + 1, margin + 150, finalY + 1);
+        doc.text("Date:", pageWidth - margin - 50, finalY);
+        doc.line(
+          pageWidth - margin - 30,
+          finalY + 1,
+          pageWidth - margin,
+          finalY + 1
+        );
+      }
+
+      const fileName = `Damaged_Returned_Report_${reportType}_${formattedDate.replace(
+        /\//g,
+        "-"
+      )}.pdf`;
+      doc.save(fileName);
     } catch (err) {
-      setError("Failed to update status");
-      setStatusModal((prev) => ({ ...prev, loading: false }));
+      console.error("PDF generation error:", err);
+      alert("Error generating PDF. Please try again.");
+    } finally {
+      setPdfLoading(false);
     }
   };
 
-  const totalItems = items.length;
-  const damagedItems = items.filter((item) => item.status === "Damaged").length;
-  const returnedItems = items.filter((item) => item.status === "Returned").length;
-  const totalValue = items.reduce(
-    (sum, item) => sum + item.quantity_in_stock * item.purchase_price,
-    0
-  );
+  const handleAllPDF = () => {
+    if (items.length === 0) return alert("No items found.");
+    generatePDF(items, "all");
+  };
+
+  const handleSelectedPDF = () => {
+    const selectedProducts = filteredItems.filter((i) =>
+      selectedItems.has(i._id)
+    );
+    if (selectedProducts.length === 0) return alert("Please select items.");
+    generatePDF(selectedProducts, "selected");
+  };
 
   if (loading)
     return (
-      <div id="idr_loading-page">
+      <div className="idr_loading-page">
         <InventoryManagementNav />
-        <div className="idr_loading-container">
-          <p className="idr_loading-text">Loading damaged & returned items...</p>
+        <div className="idr_loading-text">
+          Loading damaged & returned items...
         </div>
       </div>
     );
@@ -141,173 +278,204 @@ const Inevntory_Damaged_Return = () => {
   return (
     <div id="idr_inventory-damaged-return">
       <InventoryManagementNav />
-      <div className="idr_damaged-return-container">
-        <div className="idr_page-header">
+
+      <div id="idr_damaged-return-container">
+        {/* Page Header */}
+        <div id="idr_page-header">
           <h2>Damaged & Returned Inventory</h2>
-          <p className="idr_page-subtitle">Manage and track products marked as damaged or returned</p>
+          <p id="idr_page-subtitle">
+            Overview of damaged and returned stock with filters & reports
+          </p>
         </div>
 
         {/* Statistics */}
-        <div className="idr_stats-container">
+        <div id="idr_stats-container">
           <div className="idr_stat-card">
-            <h3>Damaged Items</h3>
-            <p className="idr_stat-number">{damagedItems}</p>
+            <h3>Damaged</h3>
+            <span className="idr_stat-number">{stats.damagedItems}</span>
           </div>
           <div className="idr_stat-card">
-            <h3>Returned Items</h3>
-            <p className="idr_stat-number">{returnedItems}</p>
+            <h3>Returned</h3>
+            <span className="idr_stat-number">{stats.returnedItems}</span>
           </div>
           <div className="idr_stat-card">
             <h3>Total Items</h3>
-            <p className="idr_stat-number">{totalItems}</p>
+            <span className="idr_stat-number">{stats.totalItems}</span>
           </div>
           <div className="idr_stat-card">
-            <h3>Total Value</h3>
-            <p className="idr_stat-number">LKR {totalValue.toLocaleString()}</p>
+            <h3>Selected</h3>
+            <span className="idr_stat-number">{selectedItems.size}</span>
+          </div>
+          <div className="idr_stat-card">
+            <h3>Total Capital</h3>
+            <span className="idr_stat-number">
+              Rs.{" "}
+              {stats.totalCapital.toLocaleString("en-US", {
+                minimumFractionDigits: 2,
+                maximumFractionDigits: 2,
+              })}
+            </span>
           </div>
         </div>
 
         {/* Filters */}
-        <div className="idr_filters-container">
+        <div id="idr_filters-container">
           <div className="idr_search-box">
             <input
               type="text"
-              placeholder="Search damaged/returned items..."
+              id="idr_search-input"
+              placeholder="Search by item name, serial number..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="idr_search-input"
             />
           </div>
           <div className="idr_filter-group">
             <select
-              value={filters.category}
-              onChange={(e) => handleFilterChange("category", e.target.value)}
+              id="idr_status-filter"
+              value={filterStatus}
+              onChange={(e) => setFilterStatus(e.target.value)}
             >
-              <option value="all">All Categories</option>
+              <option value="all">All Status</option>
+              {statusOptions.map((s) => (
+                <option key={s} value={s}>
+                  {s}
+                </option>
+              ))}
+            </select>
+
+            <select
+              id="idr_category-filter"
+              value={filterCategory}
+              onChange={(e) => setFilterCategory(e.target.value)}
+            >
               {categories.map((cat) => (
                 <option key={cat} value={cat}>
                   {cat}
                 </option>
               ))}
             </select>
-            <select
-              value={filters.status}
-              onChange={(e) => handleFilterChange("status", e.target.value)}
+          </div>
+          <div id="idr_selection-controls">
+            <button
+              id="idr_select-all-btn"
+              onClick={selectAllItems}
+              disabled={filteredItems.length === 0}
             >
-              <option value="all">All Status</option>
-              {statusOptions.map((status) => (
-                <option key={status} value={status}>
-                  {status}
-                </option>
-              ))}
-            </select>
-            <select
-              value={filters.sortBy}
-              onChange={(e) => handleSortChange(e.target.value, filters.sortOrder)}
-            >
-              <option value="createdAt">Sort by Date</option>
-              <option value="item_name">Sort by Name</option>
-              <option value="purchase_price">Sort by Cost</option>
-              <option value="quantity_in_stock">Sort by Quantity</option>
-            </select>
+              {selectedItems.size === filteredItems.length &&
+              filteredItems.length > 0
+                ? "Deselect All"
+                : "Select All"}
+            </button>
+            {selectedItems.size > 0 && (
+              <span id="idr_selected-count">{selectedItems.size} selected</span>
+            )}
           </div>
         </div>
 
-        {error && <div className="idr_error-message">{error}</div>}
+        {/* Error */}
+        {error && <div id="idr_error-message">{error}</div>}
 
-        {/* Items Grid */}
-        <div className="idr_items-grid">
-          {filteredItems.length > 0 ? (
-            filteredItems.map((item) => (
-              <div key={item._id} className={`idr_item-card`}>
-                <div className="idr_item-image-container">
-                  <img
-                    src={item.item_image ? `http://localhost:5000/images/${item.item_image}` : "/placeholder-image.png"}
-                    alt={item.item_name}
-                    className="idr_item-image"
-                    onError={(e) => (e.target.src = "/placeholder-image.png")}
+        {/* PDF Controls */}
+        <div id="idr_pdf-controls">
+          <button
+            id="idr_pdf-all"
+            onClick={handleAllPDF}
+            disabled={pdfLoading || items.length === 0}
+          >
+            {pdfLoading ? "Generating..." : "Full Inventory PDF"}
+          </button>
+          <button
+            id="idr_pdf-selected"
+            onClick={handleSelectedPDF}
+            disabled={pdfLoading || selectedItems.size === 0}
+          >
+            {pdfLoading
+              ? "Generating..."
+              : `Selected (${selectedItems.size}) PDF`}
+          </button>
+        </div>
+
+        {/* Table */}
+        <div id="idr_inventory-table-container">
+          <table id="idr_inventory-table">
+            <thead>
+              <tr>
+                <th>
+                  <input
+                    type="checkbox"
+                    checked={
+                      selectedItems.size === filteredItems.length &&
+                      filteredItems.length > 0
+                    }
+                    onChange={selectAllItems}
+                    disabled={filteredItems.length === 0}
                   />
-                  <div className={`idr_status-badge ${item.status.toLowerCase()}`}>
-                    {item.status}
-                  </div>
-                </div>
-                <div className="idr_item-details">
-                  <h3 className="idr_item-name">{item.item_name}</h3>
-                  <p className="idr_item-serial">SN: {item.serial_number}</p>
-                  <p className="idr_item-category">{item.category}</p>
-                  <p className="idr_stock-quantity">{item.quantity_in_stock} units</p>
-                  <p className="idr_cost-price">Cost: LKR {item.purchase_price?.toLocaleString()}</p>
-                  <p className="idr_loss-value">
-                    Loss: LKR {(item.quantity_in_stock * item.purchase_price)?.toLocaleString()}
-                  </p>
-                  {item.product_remark && (
-                    <p className="idr_item-remark"><strong>Reason:</strong> {item.product_remark}</p>
-                  )}
-                  {item.description && <p className="idr_item-description">{item.description}</p>}
-                </div>
-                <div className="idr_item-actions">
-                  <button className="idr_btn-update" onClick={() => openStatusModal(item)}>
-                    Update Status
-                  </button>
-                </div>
-              </div>
-            ))
-          ) : (
-            <div className="idr_no-items-found">
-              <h3>No Damaged or Returned Items Found</h3>
-              <p>Currently no items are marked as damaged or returned.</p>
-              {searchTerm && (
-                <button className="idr_btn-clear-search" onClick={() => setSearchTerm("")}>
-                  Clear Search
-                </button>
+                </th>
+                <th>#</th>
+                <th>Image</th>
+                <th>Serial Number</th>
+                <th>Item Name</th>
+                <th>Category</th>
+                <th>Status</th>
+                <th>Quantity</th>
+                <th>Unit Price</th>
+                <th>Total Value</th>
+                <th>Remark</th>
+              </tr>
+            </thead>
+            <tbody>
+              {filteredItems.length > 0 ? (
+                filteredItems.map((item, idx) => {
+                  const unitPrice = item.purchase_price || 0;
+                  const totalValue = unitPrice * (item.quantity_in_stock || 0);
+                  return (
+                    <tr
+                      key={item._id}
+                      className={
+                        selectedItems.has(item._id) ? "idr_row-selected" : ""
+                      }
+                    >
+                      <td>
+                        <input
+                          type="checkbox"
+                          checked={selectedItems.has(item._id)}
+                          onChange={() => toggleItemSelection(item._id)}
+                        />
+                      </td>
+                      <td>{idx + 1}</td>
+                      <td>
+                        <img
+                          src={
+                            item.item_image
+                              ? `http://localhost:5000/images/${item.item_image}`
+                              : "/placeholder-image.png"
+                          }
+                          alt={item.item_name}
+                          className="idr_table-image"
+                        />
+                      </td>
+                      <td>{item.serial_number}</td>
+                      <td>{item.item_name}</td>
+                      <td>{item.category}</td>
+                      <td>{item.status}</td>
+                      <td>{item.quantity_in_stock}</td>
+                      <td>Rs. {unitPrice.toLocaleString()}</td>
+                      <td>Rs. {totalValue.toLocaleString()}</td>
+                      <td>{item.product_remark || "-"}</td>
+                    </tr>
+                  );
+                })
+              ) : (
+                <tr>
+                  <td colSpan="11" id="idr_no-items">
+                    No items found
+                    {searchTerm && ` matching "${searchTerm}"`}
+                  </td>
+                </tr>
               )}
-            </div>
-          )}
+            </tbody>
+          </table>
         </div>
-
-        {/* Status Update Modal */}
-        {statusModal.isOpen && (
-          <div className="idr_modal-overlay">
-            <div className="idr_modal">
-              <h3>Update Item Status</h3>
-              <p>Update the status for "{statusModal.item?.item_name}"</p>
-
-              <div className="idr_form-group">
-                <label>Status:</label>
-                <select value={statusModal.newStatus} onChange={handleStatusChange}>
-                  {statusOptions.map((option) => (
-                    <option key={option} value={option}>
-                      {option}
-                    </option>
-                  ))}
-                </select>
-              </div>
-
-              <div className="idr_form-group">
-                <label>Reason/Remarks:</label>
-                <textarea
-                  value={statusModal.remark}
-                  onChange={handleRemarkChange}
-                  placeholder="Enter reason for status change..."
-                  rows="3"
-                />
-              </div>
-
-              <div className="idr_modal-actions">
-                <button className="idr_btn-cancel" onClick={closeStatusModal} disabled={statusModal.loading}>
-                  Cancel
-                </button>
-                <button
-                  className="idr_btn-confirm-update"
-                  onClick={handleStatusUpdate}
-                  disabled={statusModal.loading}
-                >
-                  {statusModal.loading ? "Updating..." : "Update Status"}
-                </button>
-              </div>
-            </div>
-          </div>
-        )}
       </div>
     </div>
   );

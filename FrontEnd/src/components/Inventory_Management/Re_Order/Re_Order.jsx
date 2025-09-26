@@ -6,7 +6,7 @@ import "./Re_Order.css";
 const Re_Order = () => {
   const [items, setItems] = useState([]);
   const [suppliers, setSuppliers] = useState([]);
-  const [requests, setRequests] = useState([]); // 🔥 store product requests
+  const [requests, setRequests] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [showModal, setShowModal] = useState(false);
@@ -18,7 +18,7 @@ const Re_Order = () => {
   useEffect(() => {
     fetchLowStockItems();
     fetchSuppliers();
-    fetchRequests(); // 🔥 load requests when page opens
+    fetchRequests();
   }, []);
 
   const fetchLowStockItems = async () => {
@@ -108,7 +108,7 @@ const Re_Order = () => {
         alert(`Reorder request placed for ${selectedItem.item_name}!`);
         setShowModal(false);
         fetchLowStockItems();
-        fetchRequests(); // 🔥 refresh requests after placing order
+        fetchRequests();
       } else {
         throw new Error("Failed to place reorder request");
       }
@@ -130,9 +130,11 @@ const Re_Order = () => {
       : "N/A";
 
   const formatCurrency = (amount) =>
-    new Intl.NumberFormat("en-US", {
+    new Intl.NumberFormat("en-LK", {
       style: "currency",
-      currency: "USD",
+      currency: "LKR",
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2,
     }).format(amount ?? 0);
 
   return (
@@ -285,14 +287,13 @@ const Re_Order = () => {
                     <p>Current Stock: {selectedItem.quantity_in_stock}</p>
                     <p>Reorder Level: {selectedItem.re_order_level}</p>
                     <p>
-                      Unit Price: $
-                      {Number(selectedItem.purchase_price ?? 0).toFixed(2)}
+                      Unit Price: {formatCurrency(selectedItem.purchase_price)}
                     </p>
                     <p>
-                      Total Price: $
-                      {(
+                      Total Price:{" "}
+                      {formatCurrency(
                         Number(selectedItem.purchase_price ?? 0) * orderQuantity
-                      ).toFixed(2)}
+                      )}
                     </p>
                   </div>
                 </div>
